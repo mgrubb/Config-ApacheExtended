@@ -1,4 +1,4 @@
-Config::ApacheExtended 1.14
+Config::ApacheExtended 1.15
 ========================
 
 INSTALLATION
@@ -42,7 +42,7 @@ e-mail bug-Config-ApacheExtended@rt.cpan.org
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2003 Michael Grubb
+    Copyright (C) 2003-2004 Michael Grubb
 
     This program is free software; you can redistribute it and/or modify
     it under the same terms as Perl 5 itself.

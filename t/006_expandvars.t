@@ -2,8 +2,9 @@
 
 # t/006_expandvars.t - Tests the variable expansion feature
 
-use Test::More tests => 11;
+use Test::More tests => 17;
 use Config::ApacheExtended;
+use English;
 my $conf = Config::ApacheExtended->new(
 	source			=> "t/expandvars.conf",
 	expand_vars		=> 1,
@@ -18,8 +19,10 @@ my $foo = $conf->get('Foo');
 my $thisfoo = $conf->get('ThisFoo');
 my @bar = $conf->get( 'Bar' );
 my $block = $conf->block( FooBar => 'baz test' );
-my $boom = $block->get('Boom');
-my $cstr = join($", @bar);
+my @boom = $block->get('Boom');
+my $blat = $block->get('Blat');
+my $idxtest = $conf->get('SomeIdxTest');
+my $cstr = join($LIST_SEPARATOR, @bar);
 
 ok($foo);														# test 3
 is($foo, 'bar');												# test 4
@@ -30,5 +33,12 @@ is($thisfoo,$foo);												# test 6
 ok($block);														# test 7
 ok(@bar);														# test 8
 is(scalar(@bar), 2);											# test 9
-ok($boom);														# test 10
-is($boom, $cstr);												# test 11
+ok(@boom);														# test 10
+is(scalar(@boom), scalar(@bar));								# test 11
+is($boom[0], $bar[0]);											# test 12
+is($boom[1], $bar[1]);											# test 13
+ok($blat);														# test 14
+is($blat, $cstr);												# test 15
+
+ok($idxtest);													# test 16
+is($idxtest, $bar[1]);											# test 17

@@ -405,7 +405,7 @@ sub _substituteValues
 			while( my $varspec = extract_variable($newval, qr/(?:.*?)(?=[\$\@])/) )
 			{
 				my($type,$var,$idx) = $varspec =~ m/^([\$\@])(.*?)(?:\[(\d+)\])?$/;
-				$idx ||= 0;
+#				$idx ||= 0;
 				my $pattern;
 				($pattern = $varspec) =~ s/([^\w\s])/\\$1/g;
 				$var = $self->{_ignore_case} ? lc $var : $var;
@@ -416,13 +416,18 @@ sub _substituteValues
 					last;
 				}
 
-				if ( $type eq '$' )
+				if ( $type eq '$' && defined($idx) )
 				{
 					$data->{$key}->[$i] =~ s/$pattern/$lval[$idx]/g;
 				}
-				elsif( $type eq '@' )
+				elsif ( $type eq '$' )
 				{
 					$data->{$key}->[$i] =~ s/$pattern/join($", @lval)/eg;
+				}
+				elsif ( $type eq '@' )
+				{
+					splice(@{$data->{$key}}, $i, 1, @lval);
+#					$data->{$key}->[$i] =~ s/$pattern/join($", @lval)/eg;
 				}
 			}
 		}

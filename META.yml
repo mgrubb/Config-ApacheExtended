@@ -14,4 +14,4 @@ requires:
     Text::Balanced:                1.89
 
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+generated_by: ExtUtils::MakeMaker version 6.20

@@ -405,7 +405,7 @@ sub _substituteValues
 			while( my $varspec = extract_variable($newval, qr/(?:.*?)(?=[\$\@])/) )
 			{
 				my($type,$var,$idx) = $varspec =~ m/^([\$\@])(.*?)(?:\[(\d+)\])?$/;
-#				$idx ||= 0;
+				$idx ||= 0;
 				my $pattern;
 				($pattern = $varspec) =~ s/([^\w\s])/\\$1/g;
 				$var = $self->{_ignore_case} ? lc $var : $var;
@@ -416,18 +416,20 @@ sub _substituteValues
 					last;
 				}
 
-				if ( $type eq '$' && defined($idx) )
+				if ( $type eq '$' )
 				{
 					$data->{$key}->[$i] =~ s/$pattern/$lval[$idx]/g;
 				}
-				elsif ( $type eq '$' )
-				{
-					$data->{$key}->[$i] =~ s/$pattern/join($", @lval)/eg;
-				}
 				elsif ( $type eq '@' )
 				{
-					splice(@{$data->{$key}}, $i, 1, @lval);
-#					$data->{$key}->[$i] =~ s/$pattern/join($", @lval)/eg;
+					if ( $data->{$key}->[$i] =~ m/^$pattern$/ )
+					{
+						splice(@{$data->{$key}}, $i, 1, @lval);
+					}
+					else
+					{
+						$data->{$key}->[$i] =~ s/$pattern/join($", @lval)/eg;
+					}
 				}
 			}
 		}
@@ -629,6 +631,55 @@ sub _createBlock
 }
 
 1;
+
+=head1 VARIABLE SUBSTITUTION
+
+It just occured to me that this section has been omitted for some time. Sorry.
+Variable substitution is supported in one of three ways.  Given the configuration:
+
+  ValList1 myval1 myval2
+  ValList2 myval3 myval4
+
+  MyVal @ValList1 @ValList2
+  OddVal thatval1 @ValList1 thatval2
+  Stringification "The (@ValList1) is a list of two values"
+  AnotherVal $ValList1
+  YetAnotherVal $ValList2[1]
+
+Retrieving C<MyVal> will yield a list with 4 values namely: I<myval1, myval2, myval3, myval4>.
+Retrieving C<OddVal> will also yield a list with 4 values: I<thatval1, myval1, myval2, thatval2>.
+Retrieving C<AnotherVal> will yeild I<myval1>.  Retrieving C<YetAnotherVal> will yield: I<myval4>.
+Retrieving C<Stringification> will yield the string: I<The (myval1 myval2) is a list of two values>.
+
+So this leads to the conclusion that:
+
+=over 4
+
+=item *
+
+The "$" prefix substitutes the first/only value of another directive.
+
+=item *
+
+The "$" prefix used with the index I<N> after the directive name will substitute the Nth value of the other directive.
+Indexes are zero indexed just as Perl array indexes are.
+
+=item *
+
+The "@" prefix substitutes the entire value list of the other directive in place.
+
+=item *
+
+The "@" prefix will substitute the entire value list joined on the C<$LIST_SEPARATOR> if it occurs within a quoted string.
+B<NOTE:> That C<"@SomeVal"> will not cause stringification of the list.  I'm working on this.
+
+=back
+
+This behaviour has only slightly changed from 1.15 to 1.16.  The difference is that the "@" prefix now causes the entire list
+to be substituted rather than having the values joined with the C<$LIST_SEPARATOR> character.
+Also note that substitution B<WILL> occur inside single quotes.  This is a limitation of the current implementation,
+as I do not have enough hints at substitution time to know whether the values where inside single or double quotes.
+I welcome patches/suggestions to fix this.
 
 =head1 BUGS
 

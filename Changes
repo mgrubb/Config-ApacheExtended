@@ -31,3 +31,13 @@ Revision history for Perl module Config::ApacheExtended
 		construct to perl_quotelike.  So I had to replace perl_quotelike
 		directive in the grammar with a regular expression.  This means that
 		only ' & " are considered as quote characters.
+
+1.16 Fri Sep 17 10:48:40 CDT 2004
+	- Changed variable substitution
+		The change involved not "joining" the list of substituted
+		values with the "$LIST_SEPARATOR" value when the "@" is used
+		as the prefix.  Now when "@" prefix is used it will insert the
+		referenced values as a list.  The $v[x] syntax is still supported,
+		and if no index is given then the first value is still used.
+	- Added the long missing VARIABLE SUBSTITUTION section. (I thought it was there
+		honest)

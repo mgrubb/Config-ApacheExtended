@@ -2,7 +2,7 @@
 
 # t/006_expandvars.t - Tests the variable expansion feature
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 use Config::ApacheExtended;
 use English;
 my $conf = Config::ApacheExtended->new(
@@ -22,6 +22,7 @@ my $block = $conf->block( FooBar => 'baz test' );
 my @boom = $block->get('Boom');
 my $blat = $block->get('Blat');
 my $idxtest = $conf->get('SomeIdxTest');
+my $arstrtest = $conf->get('ArrayStringTest');
 my $cstr = join($LIST_SEPARATOR, @bar);
 
 ok($foo);														# test 3
@@ -38,7 +39,10 @@ is(scalar(@boom), scalar(@bar));								# test 11
 is($boom[0], $bar[0]);											# test 12
 is($boom[1], $bar[1]);											# test 13
 ok($blat);														# test 14
-is($blat, $cstr);												# test 15
+is($blat, $bar[0]);												# test 15
 
 ok($idxtest);													# test 16
 is($idxtest, $bar[1]);											# test 17
+
+ok($arstrtest);													# test 18
+is($arstrtest, "Batman, $cstr, Joker.");						# test 19

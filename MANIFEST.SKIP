@@ -16,3 +16,4 @@ CVS/.*
 ~$
 ^RD_TRACE$
 ^VERSION$
+^MANIFEST\.SKIP$

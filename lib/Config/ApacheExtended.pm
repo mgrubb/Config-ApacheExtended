@@ -101,8 +101,8 @@ $::RD_TRACE = 1;
 		valid_blocks	=> [],
 		include_keys	=> [qr/include/i],
 		source			=> undef,
-		_current_block	=> ["",undef],
 		_prev_blocks	=> [],
+		_data			=> {},
 	);
 
 	sub new
@@ -110,6 +110,7 @@ $::RD_TRACE = 1;
 		my $class = shift;
 
 		my $self = bless ({%default_parameters,@_}, ref ($class) || $class);
+		$self->{_current_block} = ["", $self->{_data}];
 		$self->_normalize_source();
 #		$self->{_parser} = Parse::RecDescent->new(join('', <DATA>));
 		$parser = Parse::RecDescent->new(join('', <DATA>));
@@ -172,41 +173,40 @@ sub parse
 	}
 }
 
-sub _getCurrentBlock
-{
-	return defined($_[0]->{_current_block}->[1])
-			? ($_[0]->{_current_block}->[0..1])
-			: ("",$_[0]);
-}
+#sub _getCurrentBlock
+#{
+#	return defined($_[0]->{_current_block}->[1])
+#			? [$_[0]->{_current_block}->[0..1]]
+#			: ["",$_[0]];
+#}
 
-sub _setCurrentBlock
-{
-	my $self = shift;
-	my($blockname,$block) = @_;
-}
+#sub _setCurrentBlock
+#{
+#	my $self = shift;
+#	my($blockname,$block) = @_;
+#}
 
 sub _newDirective
 {
 	my $self = shift;
 	my($dir,$vals) = @_;
+	$self->{_current_block}->[1]->{_data}->{$dir} = $vals;
+	return 1;
 }
 
 sub _beginBlock
 {
 	my $self = shift;
-	my($block,$args) = @_;
-	my $name = shift @{$args} if $args;
+	my($block,$name) = @_;
 	$name ||= $block;
-	my $new_block = Config::ApacheExtended->new(
-		%$self,
-		_current_block	=> ["",undef],
-		_prev_blocks	=> [],
-		_parent			=> $self,
-	);
+	my $new_block = {};
+	my($current_block_name,$current_block) = @{$self->{_current_block}};
 
-	my $current_block = [$self->_getCurrentBlock()];
-	$current_block->[1]->{_data}->{$block}->{$name} = $new_block;
-	push(@{$self->{_prev_blocks}}, [$current_block->[0] => $new_block]);
+	$current_block->{_data}->{$block}->{$name} = $new_block;
+	push(@{$self->{_prev_blocks}}, $self->{_current_block});
+	$self->{_current_block} = [ $block, $new_block ];
+
+	return 1;
 }
 
 sub _endBlock

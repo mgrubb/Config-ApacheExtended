@@ -15,10 +15,7 @@ BEGIN {
 	$DEBUG		= 0;
 }
 
-
-########################################### main pod documentation begin ##
-# Below is the stub of documentation for your module. You better edit it!
-
+=pod
 
 =head1 NAME
 
@@ -31,6 +28,7 @@ Config::ApacheExtended -
   use Config::ApacheExtended
   my $conf = Config::ApacheExtended->new(source => "t/parse.conf");
   $conf->parse() or die "Unsuccessful Parsing of config file";
+
   # Print out all the Directives
   foreach ($conf->get())
   {
@@ -47,10 +45,10 @@ Config::ApacheExtended -
           {
               my $block = $_;
               foreach ($block->get())
-			  {
+              {
                   print "$_ => " . $block->get($_) . "\n";
               }
-	      }
+          }
       }
   }
 
@@ -67,105 +65,85 @@ and split lines properly.
 
 =head1 METHODS
 
-  new( opt => "value" )
-Constructs a new Config::ApacheExtended object.
-Options are:
+=head2 new
+
+Usage     : Config::AapcheExtended->new( I<%options> )
+
+Purpose   : Construct a new Config::ApacheExtended object
+
+Returns   : A new Config::ApacheExtended object, or undef on
+            error.
+
+=head3 Arguments :
 
 =over 4
 
-=item source
+=item source - I<path string>
 
 The relative or absolute path to the configuration file.
 If a relative path is given, it is resolved using File::Spec::rel2abs
 
-=item expand_vars
+=item expand_vars - I<boolean>
 
-Turn on variable expansion support. (See L<Config::ApacheExtended/"VARIABLE SUBSTITUTION">)
-Defaults to OFF.
+Turn on variable expansion support. (See L</"VARIABLE SUBSTITUTION">)
 
-=item conf_root
+Defaults to B<OFF>.
+
+=item conf_root - I<path string>
 
 The directory to use as the base for relative path resolutions (i.e. for include statements)
 
-=item root_directive
+=item root_directive - I<string>
 
 If this option is set then it will be used as conf_root.
 This is handy if parsing an apache config file set it to "ServerRoot".
 
-=item honor_include
+=item honor_include - I<boolean>
 
 Set this option to false to turn off include support. 
-Defaults to ON.
 
-=item inherit_vals
+Defaults to B<ON>.
+
+=item inherit_vals - I<boolean>
 
 If this option is set value inheritance will be enabled.
-Defaults to OFF.
 
-=item ignore_case
+Defaults to B<OFF>.
+
+=item ignore_case - I<boolean>
 
 If this option is turned off then directives and block names are case sensitive.
-Defaults to ON.
 
+Defaults to B<ON>.
+
+=item die_on_nokey - I<boolean>
+
+If this option is turned on then get() will die if the given key is not found,
+when this option is off get() will return undef when the key is not found.
+
+Defaults to B<OFF>.
+
+=item die_on_noblock - I<boolean>
+
+Same as die_on_noblock, except for the block() method.
+These two options are here to help emulate behaviour in
+Config::ApacheFormat.
+
+Defaults to B<OFF>.
+
+=item valid_directives - I<Array Ref>
+
+This option allows you to specify a list of valid directives.
+If the parser comes across any directive not in this list, it will fail.
+
+=item valid_blocks - I<Array Ref>
+
+This option is the same as valid_directives except it applies to block
+specifiers.
 
 =back
 
-		_die_on_nokey		=> 0,
-		_die_on_noblock		=> 0,
-		_valid_directives	=> undef,
-		_valid_blocks		=> undef,
-		_source				=> undef,
-
-
-=head1 BUGS
-
-
-
-=head1 SUPPORT
-
-
-
-=head1 AUTHOR
-
-	A. U. Thor
-	a.u.thor@a.galaxy.far.far.away
-	http://a.galaxy.far.far.away/modules
-
-=head1 COPYRIGHT
-
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
-
-
-=head1 SEE ALSO
-
-perl(1).
-
 =cut
-
-############################################# main pod documentation end ##
-
-
-################################################ subroutine header begin ##
-
-=head2 sample_function
-
- Usage     : How to use this function/method
- Purpose   : What it does
- Returns   : What it returns
- Argument  : What it wants to know
- Throws    : Exceptions and other anomolies
- Comments  : This is a sample subroutine header.
-           : It is polite to include more pod and fewer comments.
-
-See Also   : 
-
-=cut
-
-################################################## subroutine header end ##
 
 {
 	my %_def_params = (
@@ -228,6 +206,44 @@ sub _resolveSource
 
 	return ($source,$conf_root);
 }
+
+=pod
+
+=head2 parse
+
+=over 4
+
+Usage     : $conf->parse( I<source> );
+
+Purpose   : Causes the Config::ApacheExtended
+            object to parse the given source.
+
+Returns   : undef on error, number of top level
+            directives found if successful.
+
+Argument  : B<Optional.> The source to parse. This argument gives
+            some more options than what the source argument to new()
+            allows.  This can be a filehandle (GLOB or L<IO::File>),
+            a relative or absolute path string, or a reference to a
+            scalar holding the contents to parse.
+
+Throws    : Croaks on unresolvable path string.
+
+
+For example:
+
+  my $contents = "DirectiveA valueA\n" .
+    "DirectiveB valueB\n" .
+    "<BlockC valuec>\n" .
+      "DirectiveD valueD\n" .
+    "</BlockC>\n";
+
+  my $conf = Config::ApacheExtended->new();
+  $conf->parse(\$contents);
+
+=back
+
+=cut
 
 sub parse
 {
@@ -414,6 +430,50 @@ sub _substituteValues
 	}
 }
 
+=pod
+
+=head2 get
+
+=over 4
+
+Usage     : get( I<DirectiveName> )
+
+Purpose   : Retrieve a value, or a list of directives in
+            current block.
+
+Returns   : If a directive has a single value associated with it
+            get() returns that value as a scalar regardless of
+            context, if a directive has more than one value and
+            get() is called in a list context then a list is
+            returned, if get() is called in a scalar context, then
+            an anonymous array is returned. If no directive can be
+            found an empty list or undef is returned respective of
+            the context in which get() was called.  If no
+            directive is given then a list of keys in the current
+            block is returned.
+
+Argument  : B<Optional.> Directive name
+
+Throws    : Only if die_on_nokey is turned B<ON>.
+
+See Also  : block()
+
+For Example:
+
+  # Print out a list of all this block's directives
+  my @directives = $conf->get();
+  map { print "$_\n" } @directives;
+
+  my @vals = $conf->get('Bar') or die "Could not find 'Bar'";
+  print join(", ", @vals);
+
+  my $vals = $conf->get('Bar');
+  print join(", ", @$vals);
+
+=back
+
+=cut
+
 sub get
 {
 	my $self = shift;
@@ -438,7 +498,7 @@ sub get
 		}
 		else
 		{
-			return wantarray ? @{$data->{$key}} : \@{$data->{$key}};
+			return wantarray ? @{$data->{$key}} : [ @{$data->{$key}} ];
 		}
 	}
 	elsif ( $self->{_inherit_vals} && exists($self->{_parent}) )
@@ -450,6 +510,60 @@ sub get
 		return wantarray ? () : undef;
 	}
 }
+
+=pod
+
+=head2 block
+
+=over 4
+
+Usage     : block( I<< BlockType => BlockName >> )
+
+Purpose   : Retrieve a list of all blocks in the current block,
+            a list of a given block type in the current block,
+            or a specific block.
+
+Returns   : If no BlockType is given, then a list of available
+            BlockTypes is returned.  If given a BlockType then
+            block() returns a list of anonymous arrays, which
+            contain the block type followed by the block name
+            of all the blocks of the given type in the current
+            block.  This is so that retrieving a block from the
+            list is more convenient.  If a specific block is
+            requested, then a new Config::ApacheExtended object
+            is returned.  This object only contains the values
+            and blocks associated with the requested block.
+
+
+Argument  : B<Optional.> BlockType <Optional.> BlockName 
+
+Throws    : Only if die_on_noblock is turned B<ON>.
+
+See Also  : get()
+
+For Example:
+
+  # Print out a list of all the BlockTypes in this block
+  my @blocktypes = $conf->block();
+  map { print "$_\n" } @blocktypes;
+
+  # Print out all the block names of each BlockType
+  foreach my $blocktype (@blocktypes)
+  {
+      my @blocks = $conf->block($blocktype);
+      # Print the block name and list of keys for each block
+	  print "$blocktype:\n";
+	  foreach my $blockspec (@blocks)
+	  {
+	      print "\t" . $blockspec->[1] . "\n";
+		  my $block = $conf->block(@$blockspec);
+		  map { print "\t\t$_\n" } ($block->get());
+	  }
+  }
+
+=back
+
+=cut
 
 sub block
 {
@@ -475,10 +589,21 @@ sub block
 	return $self->_createBlock( $data->{$type}->{$key} );
 }
 
+=pod
+
+=head2 as_hash
+
+ Usage     : as_hash()
+ Purpose   : Returns the current block's data as a hash
+ Returns   : a copy of the current block's data as a hash ref.
+ Comments  : Don't use this.  It is Dangerous.
+
+=cut
+
 sub as_hash
 {
 	my $self = shift;
-	return \%{$self->{_data}};
+	return { %{$self->{_data}} };
 }
 
 sub _createBlock
@@ -487,9 +612,55 @@ sub _createBlock
 	my $data = shift;
 	my $block = bless { %{$self} }, ref($self);
 	$block->{_data} = {%$data};
-	$block->{_parent} = $self->{_inherit_vals} ? $self : weaken($self);
+
+	if ( $self->{_inherit_vals} )
+	{
+		my $parent = $self;
+		weaken($parent);
+		$block->{_parent} = $parent;
+	}
+
 	$block->_substituteValues() if $self->{_expand_vars};
 	return $block;
 }
 
 1;
+
+=head1 BUGS
+
+This not really a bug, more of a Todo, however This module does not currently provide
+access to multiple block "names" (i.e. <BlockType blockval1 blockval2>...</BlockType>)
+However, it will parse these blocks properly.  The only thing that needs to be done is
+to provide space in the data structure for these values, they were not important to me,
+so I didn't see the need.  However, I am willing to accept patches.
+
+Other than that, I have found no bugs, but I'm sure there are some lurking about.
+(Example code is for the most part untested, [I'm working on this, I just wanted
+to get the documentation done])
+
+=head1 SUPPORT
+
+You can email me, I can't promise response times.
+If I start getting a lot of mail I'll start a list.
+
+=head1 AUTHOR
+
+  Michael Grubb
+  mgrubb@cpan.org
+  http://www.fifthvision.net  -- This is junk right now.
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut
+

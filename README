@@ -1,4 +1,4 @@
-Config::ApacheExtended 1.11
+Config::ApacheExtended 1.12
 ========================
 
 INSTALLATION
@@ -14,10 +14,26 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-   Carp
-   Scalar::Util       1.07
-   Text::Balanced     1.89
-   File::Spec         0.82
+	Carp					1.01
+	File::Spec::Functions	1.3
+	IO::File				1.09
+	Parse::RecDescent		1.94
+	Scalar::Util			1.07
+	Test::More				0.47
+	Text::Balanced			1.95
+
+
+SUPPORT
+
+There is no "official" support for this module,
+and there is definately no warrantee expressed or implied.
+If you use this module and it fries your machine, I am in no way
+liable.  However, you may e-mail me with questions, comments,
+patches, etc. If there comes a time when I can't keep up with
+everything in a timely manner I will start a list.
+
+Michael Grubb <mgrubb@cpan.org>
+
 
 COPYRIGHT AND LICENSE
 

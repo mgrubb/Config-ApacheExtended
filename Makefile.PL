@@ -7,8 +7,13 @@ WriteMakefile(
     AUTHOR       => 'Michael Grubb (mgrubb-cpan@fifthvision.net)',
     ABSTRACT     => '',
     PREREQ_PM    => {
-                     'Test::Simple' => 0.44,
-					 'Parse::RecDescent' => 1.80,
+					 'Carp'						=> '1.01',
+					 'File::Spec::Functions'	=> '1.3',
+					 'IO::File'					=> '1.09',
+					 'Parse::RecDescent'		=> '1.94',
+					 'Scalar::Util'				=> '1.07',
+                     'Test::More'				=> '0.47',
+					 'Text::Balanced'			=> '1.95',
                     },
 );
 

@@ -11,3 +11,4 @@ Revision history for Perl module Config::ApacheExtended
 		- added the ABSTRACT to pod
 		- Filled in the README file
 		- added META.yml (via MakeMaker)
+		- removed scripts/ from distribution

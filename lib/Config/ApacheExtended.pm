@@ -1,12 +1,14 @@
 package Config::ApacheExtended;
 
 use Parse::RecDescent;
+use Config::ApacheExtended::ParseTree;
 use IO::File;
 
 use strict;
 BEGIN {
-	use vars qw ($VERSION);
-	$VERSION     = 0.5;
+	use vars qw ($VERSION $DEBUG);
+	$VERSION	= 0.5; # $Revision$
+	$DEBUG		= 0;
 }
 
 
@@ -86,10 +88,12 @@ See Also   :
 =cut
 
 ################################################## subroutine header end ##
-my $parser;
-$::RD_HINT = 1;
-$::RD_TRACE = 1;
+$::RD_HINT = 1 if $DEBUG;
+$::RD_TRACE = 1 if $DEBUG;
+
+sub new
 {
+	my $class = shift;
 	my %default_parameters = (
 		expand_vars		=> 0,
 		honor_include	=> 1,
@@ -105,18 +109,11 @@ $::RD_TRACE = 1;
 		_data			=> {},
 	);
 
-	sub new
-	{
-		my $class = shift;
-
-		my $self = bless ({%default_parameters,@_}, ref ($class) || $class);
-		$self->{_current_block} = ["", $self->{_data}];
-		$self->_normalize_source();
-#		$self->{_parser} = Parse::RecDescent->new(join('', <DATA>));
-		$parser = Parse::RecDescent->new(join('', <DATA>));
-		return $self;
-	}
-
+	my $self = bless ({%default_parameters,@_}, ref ($class) || $class);
+	$self->{_current_block} = ["", $self->{_data}];
+	$self->_normalize_source();
+#	$self->{_parser} = Parse::RecDescent->new(join('', <DATA>));
+	return $self;
 }
 
 sub _normalize_source
@@ -159,98 +156,34 @@ sub parse
 		$self->normalize_source($source);
 	}
 	
+	my $parser = Parse::RecDescent->new(join('', <DATA>));
 #	my $result = $self->{_parser}->grammar($self->{_contents},1,$self);
-	my $result = $parser->grammar($self->{_contents},1,$self);
+	$self->{_pt} = Config::ApacheExtended::ParseTree->new();
+	my $result = $parser->grammar($self->{_contents},1,$self->{_pt});
 	if ( defined($result) )
 	{
 		print "Parse Successful!\n";
-		return 1;
 	}
 	else
 	{
 		print "Parse Unsuccessful!\n";
 		return undef;
 	}
+
+	$self->_transliterateBlocks($result->getData);
 }
 
-#sub _getCurrentBlock
-#{
-#	return defined($_[0]->{_current_block}->[1])
-#			? [$_[0]->{_current_block}->[0..1]]
-#			: ["",$_[0]];
-#}
-
-#sub _setCurrentBlock
-#{
-#	my $self = shift;
-#	my($blockname,$block) = @_;
-#}
-
-sub _newDirective
+sub _transliterateBlocks
 {
-	my $self = shift;
-	my($dir,$vals) = @_;
-	$self->{_current_block}->[1]->{_data}->{$dir} = $vals;
-	return 1;
-}
+	my $self = shift
+	my $data = shift;
 
-sub _beginBlock
-{
-	my $self = shift;
-	my($block,$vals) = @_;
-	my $blname = defined($vals) ? $vals->[0] : $block;
-	print STDERR "BLOCK: $blname, $vals\n";
-	my $new_block = {};
-	my($current_block_name,$current_block) = @{$self->{_current_block}};
-
-	$current_block->{_data}->{$block}->{$blname} = $new_block;
-	push(@{$self->{_prev_blocks}}, $self->{_current_block});
-	$self->{_current_block} = [ $block, $new_block ];
-
-	return 1;
-}
-
-sub _endBlock
-{
-	my $self = shift;
-	my $current_block = $self->{_current_block};
-
-	if ( $current_block->[0] eq "" )
+	foreach my $key (keys %$data)
 	{
-		warn "Unexpected End-of-Block found";
-		return undef;
-	}
-	elsif ( $_[0] ne $current_block->[0] )
-	{
-		warn "Expected " . $current_block->[0] . "End-of-Block, but found $_[0] instead.";
-		return undef;
-	}
-
-	if ( @{$self->{_prev_blocks}} )
-	{
-		$self->{_current_block} = pop @{$self->{_prev_blocks}};
-		return 1;
-	}
-	else
-	{
-		warn "Unexpected End-of-Block found";
-		return undef;
+		
 	}
 }
 
-sub end
-{
-	my $self = shift;
-	if ( $self->{_current_block}->[0] ne "" )
-	{
-		warn "Expected End-of-Block for: " . $self->{_current_block}->[0];
-		return undef;
-	}
-	else
-	{
-		return 1;
-	}
-}
 
 1;
 
@@ -269,17 +202,17 @@ multiline_directive:
 
 hereto_directive:
 	key '<<' hereto_mark eol <skip: ''> hereto_line[$item[3]] eol
-		{ $data->_newDirective($item[1], [$item[6]]) }
+		{ $data->newDirective($item[1], [$item[6]]) }
 
-directive:	key val(s) <commit> eol { $data->_newDirective($item[1], $item[2]) }
-			| key eol { $data->_newDirective($item[1], [1]) }
+directive:	key val(s) <commit> eol { $data->newDirective($item[1], $item[2]) }
+			| key eol { $data->newDirective($item[1], [1]) }
 
 block_start:
 	'<' key block_val(s?) '>' eol 
-		{ $data->_beginBlock($item[2], $item[3]) }
+		{ $data->beginBlock($item[2], $item[3]) }
 
 block_end: '</' key '>' eol
-		{ $data->_endBlock($item[2]) }
+		{ $data->endBlock($item[2]) }
 
 skipline: comment | eol { 0 }
 

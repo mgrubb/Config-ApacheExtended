@@ -16,7 +16,7 @@ This module requires these other modules and libraries:
 
 	Carp
 	File::Spec::Functions	1.3
-	IO::File				1.09
+	IO::File				1.07
 	Parse::RecDescent		1.94
 	Scalar::Util			1.07
 	Test::More				0.47

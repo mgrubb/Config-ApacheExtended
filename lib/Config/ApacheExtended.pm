@@ -2,7 +2,6 @@ package Config::ApacheExtended;
 
 use Parse::RecDescent;
 use Config::ApacheExtended::Grammar;
-#use Config::ApacheExtended::ParseTree;
 use IO::File;
 use Scalar::Util qw(weaken);
 use Text::Balanced qw(extract_variable);

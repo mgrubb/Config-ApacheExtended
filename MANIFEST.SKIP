@@ -15,5 +15,3 @@ CVS/.*
 ^pm_to_blib$
 ~$
 ^RD_TRACE$
-^VERSION$
-^MANIFEST\.SKIP$

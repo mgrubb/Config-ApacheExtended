@@ -3,11 +3,12 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME         => 'Config::ApacheExtended',
-    VERSION_FROM => 'lib/Config/ApacheExtended.pm', # finds $VERSION
+#    VERSION_FROM => 'lib/Config/ApacheExtended.pm', # finds $VERSION
+    VERSION_FROM => 'VERSION', # finds $VERSION
     AUTHOR       => 'Michael Grubb (mgrubb-cpan@fifthvision.net)',
     ABSTRACT     => '',
     PREREQ_PM    => {
-					 'Carp'						=> '1.01',
+					 'Carp'						=> '0',
 					 'File::Spec::Functions'	=> '1.3',
 					 'IO::File'					=> '1.09',
 					 'Parse::RecDescent'		=> '1.94',

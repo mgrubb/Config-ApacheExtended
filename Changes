@@ -12,3 +12,9 @@ Revision history for Perl module Config::ApacheExtended
 		- Filled in the README file
 		- added META.yml (via MakeMaker)
 		- removed scripts/ from distribution
+
+1.13 Tue Jan 06 14:27:00 2004
+	- fixed dependancy declaration in Makefile.PL
+		This is because Carp prior to 5.8.0 does not have a version set
+		according to the CPAN Testing Collective.
+	- minor documentation changes

@@ -1,0 +1,8 @@
+# 1.01
+
+
+
+BEGIN
+{
+	$VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)/g);
+}

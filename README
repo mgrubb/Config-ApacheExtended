@@ -14,7 +14,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-	Carp					1.01
+	Carp
 	File::Spec::Functions	1.3
 	IO::File				1.09
 	Parse::RecDescent		1.94
@@ -33,6 +33,11 @@ patches, etc. If there comes a time when I can't keep up with
 everything in a timely manner I will start a list.
 
 Michael Grubb <mgrubb@cpan.org>
+
+BUGS
+
+Please report bugs using http://rt.cpan.org or
+e-mail bug-Config-ApacheExtended@rt.cpan.org
 
 
 COPYRIGHT AND LICENSE

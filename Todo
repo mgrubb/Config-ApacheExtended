@@ -1,0 +1,8 @@
+TODO list for Perl module Config::ApacheExtended
+
+- Add inheritance Support
+
+- Add variable substitution support
+
+- Add include support
+

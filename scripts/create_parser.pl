@@ -20,7 +20,6 @@ else
 }
 }
 
-print "$libdir\n";
 use Config::ApacheExtended;
 
 use Parse::RecDescent;

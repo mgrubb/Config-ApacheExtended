@@ -11,4 +11,11 @@ lib/Config/ApacheExtended/Parser.pm
 scripts/create_parser.pl
 t/001_load.t
 t/002_parse.t
+t/003_get.t
+t/004_block.t
+t/005_inheritance.t
+t/006_expandvars.t
+t/007_include.t
+t/expandvars.conf
+t/include.conf
 t/parse.conf

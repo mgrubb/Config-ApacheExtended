@@ -7,7 +7,7 @@ use IO::File;
 use strict;
 BEGIN {
 	use vars qw ($VERSION $DEBUG);
-	$VERSION	= 0.5; # $Revision$
+	$VERSION	= sprintf("%d.%02d", q$Revision$ =~ /(\d+)/g);
 	$DEBUG		= 0;
 }
 

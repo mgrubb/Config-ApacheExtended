@@ -175,7 +175,7 @@ sub parse
 
 sub _transliterateBlocks
 {
-	my $self = shift
+	my $self = shift;
 	my $data = shift;
 
 	foreach my $key (keys %$data)

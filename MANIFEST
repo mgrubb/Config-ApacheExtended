@@ -1,8 +1,14 @@
-MANIFEST
+Changes
 LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
 README
 Todo
-Changes
 lib/Config/ApacheExtended.pm
+lib/Config/ApacheExtended/ParseTree.pm
+lib/Config/ApacheExtended/Parser.pm
+scripts/create_parser.pl
 t/001_load.t
-Makefile.PL
+t/002_parse.t
+t/parse.conf

@@ -6,6 +6,7 @@ Makefile.PL
 README
 Todo
 lib/Config/ApacheExtended.pm
+lib/Config/ApacheExtended/Grammar.pm
 lib/Config/ApacheExtended/ParseTree.pm
 lib/Config/ApacheExtended/Parser.pm
 scripts/create_parser.pl

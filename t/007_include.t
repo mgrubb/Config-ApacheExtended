@@ -2,27 +2,37 @@
 
 # t/007_include.t - Tests the include feature
 
-use Test::More "no_plan";
+use Test::More tests => 11;
 use Config::ApacheExtended;
-my $conf = Config::ApacheExtended->new(source => "t/include.conf", expand_vars => 1, inherit_vals => 1, honor_include => 1);
 
-# test 1
-ok($conf);
+my $conf = Config::ApacheExtended->new(
+	source			=> "t/include.conf",
+	expand_vars		=> 1,
+	inherit_vals	=> 1,
+	honor_include	=> 1
+);
 
-# test 2
-isa_ok($conf, 'Config::ApacheExtended');
 
-# test 3
-ok($conf->parse);
+ok($conf);													# test 1
 
-# tests 4-7
+my $parse =$conf->parse;
+ok($parse);													# test 2
+
 my $inctest = $conf->get( 'IncludeTest' );
-ok($inctest);
-is($inctest,'inc');
-my $foo = $conf->get('Foo');
-ok($foo);
-is($foo,'bar');
+my $simple = $conf->get('SimpleDir');
+my $block = $conf->block( SomeInclude => 'inctest' );
 
-TODO: {
-local $TODO = "Directory include not done";
-}
+ok($block);													# test 3
+
+my $dira = $block->get( 'DirA' );
+my $dirb = $block->get( 'DirB' );
+
+ok($inctest);												# test 4
+is($inctest,'inc');											# test 5
+
+ok($simple);												# test 6
+is($simple,'simple');										# test 7
+ok($dira);													# test 8
+is($dira, 'config file A');									# test 9
+ok($dirb);													# test 10
+is($dirb,'config file B');									# test 11

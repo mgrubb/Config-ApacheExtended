@@ -1,5 +1,6 @@
 CVS/.*
 \.bak$
+\.swp$/
 \.sw[a-z]$
 \.tar$
 \.tgz$

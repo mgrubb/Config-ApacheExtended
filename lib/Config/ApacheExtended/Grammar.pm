@@ -1,10 +1,10 @@
-package Config::ApacheExtended::Parser;
+package Config::ApacheExtended::Grammar;
 use Parse::RecDescent;
 
 { my $ERRORS;
 
 
-package Parse::RecDescent::Config::ApacheExtended::Parser;
+package Parse::RecDescent::Config::ApacheExtended::Grammar;
 use strict;
 use vars qw($skip $AUTOLOAD  );
 $skip = '\s*';
@@ -14,17 +14,17 @@ $skip = '\s*';
 {
 local $SIG{__WARN__} = sub {0};
 # PRETEND TO BE IN Parse::RecDescent NAMESPACE
-*Parse::RecDescent::Config::ApacheExtended::Parser::AUTOLOAD	= sub
+*Parse::RecDescent::Config::ApacheExtended::Grammar::AUTOLOAD	= sub
 {
 	no strict 'refs';
-	$AUTOLOAD =~ s/^Parse::RecDescent::Config::ApacheExtended::Parser/Parse::RecDescent/;
+	$AUTOLOAD =~ s/^Parse::RecDescent::Config::ApacheExtended::Grammar/Parse::RecDescent/;
 	goto &{$AUTOLOAD};
 }
 }
 
-push @Parse::RecDescent::Config::ApacheExtended::Parser::ISA, 'Parse::RecDescent';
+push @Parse::RecDescent::Config::ApacheExtended::Grammar::ISA, 'Parse::RecDescent';
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_mark
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::hereto_mark
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -86,7 +86,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_mark
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::val($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::val($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [val]>>},
@@ -159,7 +159,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_mark
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::eol
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::eol
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -289,7 +289,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::eol
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::skipline
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::skipline
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -351,7 +351,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::skipline
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::comment($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::comment($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [comment]>>},
@@ -408,7 +408,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::skipline
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -503,7 +503,219 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::skipline
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::block_start
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::include
+{
+	my $thisparser = $_[0];
+	use vars q{$tracelevel};
+	local $tracelevel = ($tracelevel||0)+1;
+	$ERRORS = 0;
+	my $thisrule = $thisparser->{"rules"}{"include"};
+	
+	Parse::RecDescent::_trace(q{Trying rule: [include]},
+				  Parse::RecDescent::_tracefirst($_[1]),
+				  q{include},
+				  $tracelevel)
+					if defined $::RD_TRACE;
+
+	
+	my $err_at = @{$thisparser->{errors}};
+
+	my $score;
+	my $score_return;
+	my $_tok;
+	my $return = undef;
+	my $_matched=0;
+	my $commit=0;
+	my @item = ();
+	my %item = ();
+	my $repeating =  defined($_[2]) && $_[2];
+	my $_noactions = defined($_[3]) && $_[3];
+ 	my @arg =        defined $_[4] ? @{ &{$_[4]} } : ();
+	my %arg =        ($#arg & 01) ? @arg : (@arg, undef);
+	my $text;
+	my $lastsep="";
+	my $expectation = new Parse::RecDescent::Expectation($thisrule->expected());
+	$expectation->at($_[1]);
+	
+	my $thisline;
+	tie $thisline, q{Parse::RecDescent::LineCounter}, \$text, $thisparser;
+
+	
+
+	while (!$_matched && !$commit)
+	{
+		
+		Parse::RecDescent::_trace(q{Trying production: [/\\binclude\\b/i val eol]},
+					  Parse::RecDescent::_tracefirst($_[1]),
+					  q{include},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		my $thisprod = $thisrule->{"prods"}[0];
+		$text = $_[1];
+		my $_savetext;
+		@item = (q{include});
+		%item = (__RULE__ => q{include});
+		my $repcount = 0;
+
+
+		Parse::RecDescent::_trace(q{Trying terminal: [/\\binclude\\b/i]}, Parse::RecDescent::_tracefirst($text),
+					  q{include},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		$lastsep = "";
+		$expectation->is(q{})->at($text);
+		
+
+		unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ s/\A(?:\binclude\b)//i)
+		{
+			
+			$expectation->failed();
+			Parse::RecDescent::_trace(q{<<Didn't match terminal>>},
+						  Parse::RecDescent::_tracefirst($text))
+					if defined $::RD_TRACE;
+
+			last;
+		}
+		Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
+						. $& . q{])},
+						  Parse::RecDescent::_tracefirst($text))
+					if defined $::RD_TRACE;
+		push @item, $item{__PATTERN1__}=$&;
+		
+
+		Parse::RecDescent::_trace(q{Trying subrule: [val]},
+				  Parse::RecDescent::_tracefirst($text),
+				  q{include},
+				  $tracelevel)
+					if defined $::RD_TRACE;
+		if (1) { no strict qw{refs};
+		$expectation->is(q{val})->at($text);
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::val($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		{
+			
+			Parse::RecDescent::_trace(q{<<Didn't match subrule: [val]>>},
+						  Parse::RecDescent::_tracefirst($text),
+						  q{include},
+						  $tracelevel)
+							if defined $::RD_TRACE;
+			$expectation->failed();
+			last;
+		}
+		Parse::RecDescent::_trace(q{>>Matched subrule: [val]<< (return value: [}
+					. $_tok . q{]},
+					  
+					  Parse::RecDescent::_tracefirst($text),
+					  q{include},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		$item{q{val}} = $_tok;
+		push @item, $_tok;
+		
+		}
+
+		Parse::RecDescent::_trace(q{Trying subrule: [eol]},
+				  Parse::RecDescent::_tracefirst($text),
+				  q{include},
+				  $tracelevel)
+					if defined $::RD_TRACE;
+		if (1) { no strict qw{refs};
+		$expectation->is(q{eol})->at($text);
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		{
+			
+			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
+						  Parse::RecDescent::_tracefirst($text),
+						  q{include},
+						  $tracelevel)
+							if defined $::RD_TRACE;
+			$expectation->failed();
+			last;
+		}
+		Parse::RecDescent::_trace(q{>>Matched subrule: [eol]<< (return value: [}
+					. $_tok . q{]},
+					  
+					  Parse::RecDescent::_tracefirst($text),
+					  q{include},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		$item{q{eol}} = $_tok;
+		push @item, $_tok;
+		
+		}
+
+		Parse::RecDescent::_trace(q{Trying action},
+					  Parse::RecDescent::_tracefirst($text),
+					  q{include},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		
+
+		$_tok = ($_noactions) ? 0 : do { if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text; print "$text\n"; } else { $return = undef; } };
+		unless (defined $_tok)
+		{
+			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
+					if defined $::RD_TRACE;
+			last;
+		}
+		Parse::RecDescent::_trace(q{>>Matched action<< (return value: [}
+					  . $_tok . q{])},
+					  Parse::RecDescent::_tracefirst($text))
+						if defined $::RD_TRACE;
+		push @item, $_tok;
+		$item{__ACTION1__}=$_tok;
+		
+
+
+		Parse::RecDescent::_trace(q{>>Matched production: [/\\binclude\\b/i val eol]<<},
+					  Parse::RecDescent::_tracefirst($text),
+					  q{include},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		$_matched = 1;
+		last;
+	}
+
+
+        unless ( $_matched || defined($return) || defined($score) )
+	{
+		
+
+		$_[1] = $text;	# NOT SURE THIS IS NEEDED
+		Parse::RecDescent::_trace(q{<<Didn't match rule>>},
+					 Parse::RecDescent::_tracefirst($_[1]),
+					 q{include},
+					 $tracelevel)
+					if defined $::RD_TRACE;
+		return undef;
+	}
+	if (!defined($return) && defined($score))
+	{
+		Parse::RecDescent::_trace(q{>>Accepted scored production<<}, "",
+					  q{include},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		$return = $score_return;
+	}
+	splice @{$thisparser->{errors}}, $err_at;
+	$return = $item[$#item] unless defined $return;
+	if (defined $::RD_TRACE)
+	{
+		Parse::RecDescent::_trace(q{>>Matched rule<< (return value: [} .
+					  $return . q{])}, "",
+					  q{include},
+					  $tracelevel);
+		Parse::RecDescent::_trace(q{(consumed: [} .
+					  Parse::RecDescent::_tracemax(substr($_[1],0,-length($text))) . q{])}, 
+					  Parse::RecDescent::_tracefirst($text),
+					  , q{include},
+					  $tracelevel)
+	}
+	$_[1] = $text;
+	return $return;
+}
+
+# ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::block_start
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -590,7 +802,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_start
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{key})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [key]>>},
@@ -620,7 +832,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_start
 					if defined $::RD_TRACE;
 		$expectation->is(q{block_val})->at($text);
 		
-		unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::Config::ApacheExtended::Parser::block_val, 0, 100000000, $_noactions,$expectation,undef))) 
+		unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::Config::ApacheExtended::Grammar::block_val, 0, 100000000, $_noactions,$expectation,undef))) 
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match repeated subrule: [block_val]>>},
 						  Parse::RecDescent::_tracefirst($text),
@@ -673,7 +885,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_start
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -768,7 +980,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_start
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::key
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::key
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -898,7 +1110,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::key
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::statement
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::statement
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -940,7 +1152,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::statement
 	while (!$_matched && !$commit)
 	{
 		local $skip = defined($skip) ? $skip : $Parse::RecDescent::skip;
-		Parse::RecDescent::_trace(q{Trying production: [<skip: qr/[ \t]*/> multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline]},
+		Parse::RecDescent::_trace(q{Trying production: [<skip: qr/[ \t]*/> include, or multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline]},
 					  Parse::RecDescent::_tracefirst($_[1]),
 					  q{statement},
 					  $tracelevel)
@@ -985,8 +1197,8 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::statement
 				  $tracelevel)
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
-		$expectation->is(q{multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_production_1_of_rule_statement($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		$expectation->is(q{include, or multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline})->at($text);
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::_alternation_1_of_production_1_of_rule_statement($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [_alternation_1_of_production_1_of_rule_statement]>>},
@@ -1010,7 +1222,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::statement
 		}
 
 
-		Parse::RecDescent::_trace(q{>>Matched production: [<skip: qr/[ \t]*/> multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline]<<},
+		Parse::RecDescent::_trace(q{>>Matched production: [<skip: qr/[ \t]*/> include, or multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline]<<},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{statement},
 					  $tracelevel)
@@ -1059,7 +1271,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::statement
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::quote
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::quote
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -1216,7 +1428,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::quote
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_production_1_of_rule_statement
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::_alternation_1_of_production_1_of_rule_statement
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -1258,12 +1470,69 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 	while (!$_matched && !$commit)
 	{
 		
-		Parse::RecDescent::_trace(q{Trying production: [multiline_directive]},
+		Parse::RecDescent::_trace(q{Trying production: [include]},
 					  Parse::RecDescent::_tracefirst($_[1]),
 					  q{_alternation_1_of_production_1_of_rule_statement},
 					  $tracelevel)
 						if defined $::RD_TRACE;
 		my $thisprod = $thisrule->{"prods"}[0];
+		$text = $_[1];
+		my $_savetext;
+		@item = (q{_alternation_1_of_production_1_of_rule_statement});
+		%item = (__RULE__ => q{_alternation_1_of_production_1_of_rule_statement});
+		my $repcount = 0;
+
+
+		Parse::RecDescent::_trace(q{Trying subrule: [include]},
+				  Parse::RecDescent::_tracefirst($text),
+				  q{_alternation_1_of_production_1_of_rule_statement},
+				  $tracelevel)
+					if defined $::RD_TRACE;
+		if (1) { no strict qw{refs};
+		$expectation->is(q{})->at($text);
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::include($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		{
+			
+			Parse::RecDescent::_trace(q{<<Didn't match subrule: [include]>>},
+						  Parse::RecDescent::_tracefirst($text),
+						  q{_alternation_1_of_production_1_of_rule_statement},
+						  $tracelevel)
+							if defined $::RD_TRACE;
+			$expectation->failed();
+			last;
+		}
+		Parse::RecDescent::_trace(q{>>Matched subrule: [include]<< (return value: [}
+					. $_tok . q{]},
+					  
+					  Parse::RecDescent::_tracefirst($text),
+					  q{_alternation_1_of_production_1_of_rule_statement},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		$item{q{include}} = $_tok;
+		push @item, $_tok;
+		
+		}
+
+
+		Parse::RecDescent::_trace(q{>>Matched production: [include]<<},
+					  Parse::RecDescent::_tracefirst($text),
+					  q{_alternation_1_of_production_1_of_rule_statement},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		$_matched = 1;
+		last;
+	}
+
+
+	while (!$_matched && !$commit)
+	{
+		
+		Parse::RecDescent::_trace(q{Trying production: [multiline_directive]},
+					  Parse::RecDescent::_tracefirst($_[1]),
+					  q{_alternation_1_of_production_1_of_rule_statement},
+					  $tracelevel)
+						if defined $::RD_TRACE;
+		my $thisprod = $thisrule->{"prods"}[1];
 		$text = $_[1];
 		my $_savetext;
 		@item = (q{_alternation_1_of_production_1_of_rule_statement});
@@ -1278,7 +1547,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::multiline_directive($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::multiline_directive($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [multiline_directive]>>},
@@ -1320,7 +1589,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					  q{_alternation_1_of_production_1_of_rule_statement},
 					  $tracelevel)
 						if defined $::RD_TRACE;
-		my $thisprod = $thisrule->{"prods"}[1];
+		my $thisprod = $thisrule->{"prods"}[2];
 		$text = $_[1];
 		my $_savetext;
 		@item = (q{_alternation_1_of_production_1_of_rule_statement});
@@ -1335,7 +1604,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::hereto_directive($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [hereto_directive]>>},
@@ -1377,7 +1646,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					  q{_alternation_1_of_production_1_of_rule_statement},
 					  $tracelevel)
 						if defined $::RD_TRACE;
-		my $thisprod = $thisrule->{"prods"}[2];
+		my $thisprod = $thisrule->{"prods"}[3];
 		$text = $_[1];
 		my $_savetext;
 		@item = (q{_alternation_1_of_production_1_of_rule_statement});
@@ -1392,7 +1661,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::block_start($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::block_start($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [block_start]>>},
@@ -1434,7 +1703,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					  q{_alternation_1_of_production_1_of_rule_statement},
 					  $tracelevel)
 						if defined $::RD_TRACE;
-		my $thisprod = $thisrule->{"prods"}[3];
+		my $thisprod = $thisrule->{"prods"}[4];
 		$text = $_[1];
 		my $_savetext;
 		@item = (q{_alternation_1_of_production_1_of_rule_statement});
@@ -1449,7 +1718,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::block_end($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::block_end($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [block_end]>>},
@@ -1491,7 +1760,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					  q{_alternation_1_of_production_1_of_rule_statement},
 					  $tracelevel)
 						if defined $::RD_TRACE;
-		my $thisprod = $thisrule->{"prods"}[4];
+		my $thisprod = $thisrule->{"prods"}[5];
 		$text = $_[1];
 		my $_savetext;
 		@item = (q{_alternation_1_of_production_1_of_rule_statement});
@@ -1506,7 +1775,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::directive($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::directive($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [directive]>>},
@@ -1548,7 +1817,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					  q{_alternation_1_of_production_1_of_rule_statement},
 					  $tracelevel)
 						if defined $::RD_TRACE;
-		my $thisprod = $thisrule->{"prods"}[5];
+		my $thisprod = $thisrule->{"prods"}[6];
 		$text = $_[1];
 		my $_savetext;
 		@item = (q{_alternation_1_of_production_1_of_rule_statement});
@@ -1563,7 +1832,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::skipline($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::skipline($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [skipline]>>},
@@ -1636,7 +1905,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::_alternation_1_of_product
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_line
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::hereto_line
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -1788,7 +2057,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_line
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::no_space
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::no_space
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -1918,7 +2187,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::no_space
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::multiline_directive
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::multiline_directive
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -2005,7 +2274,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::multiline_directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -2101,7 +2370,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::multiline_directive
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::val
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::val
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -2163,7 +2432,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::val
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::quote($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::quote($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [quote]>>},
@@ -2220,7 +2489,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::val
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::no_space($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::no_space($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [no_space]>>},
@@ -2293,7 +2562,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::val
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::block_val
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::block_val
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -2355,7 +2624,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_val
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::quote($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::quote($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [quote]>>},
@@ -2480,7 +2749,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_val
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::hereto_directive
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -2542,7 +2811,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [key]>>},
@@ -2597,7 +2866,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{hereto_mark})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::hereto_mark($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::hereto_mark($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [hereto_mark]>>},
@@ -2627,7 +2896,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -2683,7 +2952,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{hereto_line})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::hereto_line($thisparser,$text,$repeating,$_noactions,sub { return [$item[3]] })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::hereto_line($thisparser,$text,$repeating,$_noactions,sub { return [$item[3]] })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [hereto_line]>>},
@@ -2713,7 +2982,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -2808,7 +3077,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::hereto_directive
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::grammar
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::grammar
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -2931,7 +3200,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::grammar
 					if defined $::RD_TRACE;
 		$expectation->is(q{})->at($text);
 		
-		unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::Config::ApacheExtended::Parser::statement, 0, 100000000, $_noactions,$expectation,undef))) 
+		unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::Config::ApacheExtended::Grammar::statement, 0, 100000000, $_noactions,$expectation,undef))) 
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match repeated subrule: [statement]>>},
 						  Parse::RecDescent::_tracefirst($text),
@@ -2959,7 +3228,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::grammar
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eof})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eof($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eof($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eof]>>},
@@ -3054,7 +3323,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::grammar
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::comment
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::comment
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -3166,7 +3435,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::comment
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -3261,7 +3530,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::comment
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::eof
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::eof
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -3391,7 +3660,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::eof
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::block_end
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::block_end
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -3478,7 +3747,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_end
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{key})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [key]>>},
@@ -3533,7 +3802,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_end
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -3628,7 +3897,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::block_end
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
-sub Parse::RecDescent::Config::ApacheExtended::Parser::directive
+sub Parse::RecDescent::Config::ApacheExtended::Grammar::directive
 {
 	my $thisparser = $_[0];
 	use vars q{$tracelevel};
@@ -3690,7 +3959,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [key]>>},
@@ -3720,7 +3989,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::directive
 					if defined $::RD_TRACE;
 		$expectation->is(q{val})->at($text);
 		
-		unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::Config::ApacheExtended::Parser::val, 1, 100000000, $_noactions,$expectation,undef))) 
+		unless (defined ($_tok = $thisparser->_parserepeat($text, \&Parse::RecDescent::Config::ApacheExtended::Grammar::val, 1, 100000000, $_noactions,$expectation,undef))) 
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match repeated subrule: [val]>>},
 						  Parse::RecDescent::_tracefirst($text),
@@ -3774,7 +4043,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -3853,7 +4122,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::key($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [key]>>},
@@ -3883,7 +4152,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::directive
 					if defined $::RD_TRACE;
 		if (1) { no strict qw{refs};
 		$expectation->is(q{eol})->at($text);
-		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Parser::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
+		unless (defined ($_tok = Parse::RecDescent::Config::ApacheExtended::Grammar::eol($thisparser,$text,$repeating,$_noactions,sub { \@arg })))
 		{
 			
 			Parse::RecDescent::_trace(q{<<Didn't match subrule: [eol]>>},
@@ -3977,7 +4246,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Parser::directive
 	return $return;
 }
 }
-package Config::ApacheExtended::Parser; sub new { my $self = bless( {
+package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                  '_AUTOTREE' => undef,
                  'localvars' => '',
                  'startcode' => '',
@@ -3989,7 +4258,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                'prevcolumn' => '',
                                'thiscolumn' => ''
                              },
-                 'namespace' => 'Parse::RecDescent::Config::ApacheExtended::Parser',
+                 'namespace' => 'Parse::RecDescent::Config::ApacheExtended::Grammar',
                  '_AUTOACTION' => undef,
                  'rules' => {
                               'hereto_mark' => bless( {
@@ -4014,7 +4283,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                     'implicit' => undef,
                                                                                                     'argcode' => undef,
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 30
+                                                                                                    'line' => 35
                                                                                                   }, 'Parse::RecDescent::Subrule' )
                                                                                          ],
                                                                               'line' => undef
@@ -4023,7 +4292,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                         'name' => 'hereto_mark',
                                                         'vars' => '',
                                                         'changed' => 0,
-                                                        'line' => 30
+                                                        'line' => 35
                                                       }, 'Parse::RecDescent::Rule' ),
                               'eol' => bless( {
                                                 'impcount' => 0,
@@ -4047,7 +4316,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                             'lookahead' => 0,
                                                                                             'ldelim' => '/',
                                                                                             'mod' => '',
-                                                                                            'line' => 39
+                                                                                            'line' => 44
                                                                                           }, 'Parse::RecDescent::Token' )
                                                                                  ],
                                                                       'line' => undef
@@ -4056,7 +4325,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                 'name' => 'eol',
                                                 'vars' => '',
                                                 'changed' => 0,
-                                                'line' => 39
+                                                'line' => 44
                                               }, 'Parse::RecDescent::Rule' ),
                               'skipline' => bless( {
                                                      'impcount' => 0,
@@ -4081,7 +4350,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                  'implicit' => undef,
                                                                                                  'argcode' => undef,
                                                                                                  'lookahead' => 0,
-                                                                                                 'line' => 27
+                                                                                                 'line' => 32
                                                                                                }, 'Parse::RecDescent::Subrule' )
                                                                                       ],
                                                                            'line' => undef
@@ -4101,23 +4370,81 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                  'implicit' => undef,
                                                                                                  'argcode' => undef,
                                                                                                  'lookahead' => 0,
-                                                                                                 'line' => 27
+                                                                                                 'line' => 32
                                                                                                }, 'Parse::RecDescent::Subrule' ),
                                                                                         bless( {
                                                                                                  'hashname' => '__ACTION1__',
                                                                                                  'lookahead' => 0,
-                                                                                                 'line' => 27,
+                                                                                                 'line' => 32,
                                                                                                  'code' => '{ 0 }'
                                                                                                }, 'Parse::RecDescent::Action' )
                                                                                       ],
-                                                                           'line' => 27
+                                                                           'line' => 32
                                                                          }, 'Parse::RecDescent::Production' )
                                                                 ],
                                                      'name' => 'skipline',
                                                      'vars' => '',
                                                      'changed' => 0,
-                                                     'line' => 27
+                                                     'line' => 29
                                                    }, 'Parse::RecDescent::Rule' ),
+                              'include' => bless( {
+                                                    'impcount' => 0,
+                                                    'calls' => [
+                                                                 'val',
+                                                                 'eol'
+                                                               ],
+                                                    'opcount' => 0,
+                                                    'prods' => [
+                                                                 bless( {
+                                                                          'number' => '0',
+                                                                          'strcount' => 0,
+                                                                          'dircount' => 0,
+                                                                          'uncommit' => undef,
+                                                                          'error' => undef,
+                                                                          'patcount' => 1,
+                                                                          'actcount' => 1,
+                                                                          'items' => [
+                                                                                       bless( {
+                                                                                                'description' => '/\\\\binclude\\\\b/i',
+                                                                                                'rdelim' => '/',
+                                                                                                'pattern' => '\\binclude\\b',
+                                                                                                'hashname' => '__PATTERN1__',
+                                                                                                'lookahead' => 0,
+                                                                                                'ldelim' => '/',
+                                                                                                'mod' => 'i',
+                                                                                                'line' => 27
+                                                                                              }, 'Parse::RecDescent::Token' ),
+                                                                                       bless( {
+                                                                                                'subrule' => 'val',
+                                                                                                'matchrule' => 0,
+                                                                                                'implicit' => undef,
+                                                                                                'argcode' => undef,
+                                                                                                'lookahead' => 0,
+                                                                                                'line' => 27
+                                                                                              }, 'Parse::RecDescent::Subrule' ),
+                                                                                       bless( {
+                                                                                                'subrule' => 'eol',
+                                                                                                'matchrule' => 0,
+                                                                                                'implicit' => undef,
+                                                                                                'argcode' => undef,
+                                                                                                'lookahead' => 0,
+                                                                                                'line' => 27
+                                                                                              }, 'Parse::RecDescent::Subrule' ),
+                                                                                       bless( {
+                                                                                                'hashname' => '__ACTION1__',
+                                                                                                'lookahead' => 0,
+                                                                                                'line' => 27,
+                                                                                                'code' => '{ if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text; print "$text\\n"; } else { $return = undef; } }'
+                                                                                              }, 'Parse::RecDescent::Action' )
+                                                                                     ],
+                                                                          'line' => undef
+                                                                        }, 'Parse::RecDescent::Production' )
+                                                               ],
+                                                    'name' => 'include',
+                                                    'vars' => '',
+                                                    'changed' => 0,
+                                                    'line' => 27
+                                                  }, 'Parse::RecDescent::Rule' ),
                               'block_start' => bless( {
                                                         'impcount' => 0,
                                                         'calls' => [
@@ -4141,7 +4468,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                     'hashname' => '__STRING1__',
                                                                                                     'description' => '\'<\'',
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 21
+                                                                                                    'line' => 20
                                                                                                   }, 'Parse::RecDescent::Literal' ),
                                                                                            bless( {
                                                                                                     'subrule' => 'key',
@@ -4149,7 +4476,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                     'implicit' => undef,
                                                                                                     'argcode' => undef,
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 21
+                                                                                                    'line' => 20
                                                                                                   }, 'Parse::RecDescent::Subrule' ),
                                                                                            bless( {
                                                                                                     'subrule' => 'block_val',
@@ -4160,14 +4487,14 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                     'matchrule' => 0,
                                                                                                     'repspec' => 's?',
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 21
+                                                                                                    'line' => 20
                                                                                                   }, 'Parse::RecDescent::Repetition' ),
                                                                                            bless( {
                                                                                                     'pattern' => '>',
                                                                                                     'hashname' => '__STRING2__',
                                                                                                     'description' => '\'>\'',
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 21
+                                                                                                    'line' => 20
                                                                                                   }, 'Parse::RecDescent::Literal' ),
                                                                                            bless( {
                                                                                                     'subrule' => 'eol',
@@ -4175,12 +4502,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                     'implicit' => undef,
                                                                                                     'argcode' => undef,
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 21
+                                                                                                    'line' => 20
                                                                                                   }, 'Parse::RecDescent::Subrule' ),
                                                                                            bless( {
                                                                                                     'hashname' => '__ACTION1__',
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 22,
+                                                                                                    'line' => 21,
                                                                                                     'code' => '{ $data->beginBlock($item[2], $item[3]) }'
                                                                                                   }, 'Parse::RecDescent::Action' )
                                                                                          ],
@@ -4190,7 +4517,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                         'name' => 'block_start',
                                                         'vars' => '',
                                                         'changed' => 0,
-                                                        'line' => 20
+                                                        'line' => 19
                                                       }, 'Parse::RecDescent::Rule' ),
                               'key' => bless( {
                                                 'impcount' => 0,
@@ -4214,7 +4541,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                             'lookahead' => 0,
                                                                                             'ldelim' => '/',
                                                                                             'mod' => '',
-                                                                                            'line' => 34
+                                                                                            'line' => 39
                                                                                           }, 'Parse::RecDescent::Token' )
                                                                                  ],
                                                                       'line' => undef
@@ -4223,7 +4550,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                 'name' => 'key',
                                                 'vars' => '',
                                                 'changed' => 0,
-                                                'line' => 34
+                                                'line' => 39
                                               }, 'Parse::RecDescent::Rule' ),
                               'statement' => bless( {
                                                       'impcount' => 1,
@@ -4245,16 +4572,16 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'hashname' => '__DIRECTIVE1__',
                                                                                                   'name' => '<skip: qr/[ \\t]*/>',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 6,
+                                                                                                  'line' => 5,
                                                                                                   'code' => 'my $oldskip = $skip; $skip= qr/[ \\t]*/; $oldskip'
                                                                                                 }, 'Parse::RecDescent::Directive' ),
                                                                                          bless( {
                                                                                                   'subrule' => '_alternation_1_of_production_1_of_rule_statement',
                                                                                                   'matchrule' => 0,
-                                                                                                  'implicit' => 'multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline',
+                                                                                                  'implicit' => 'include, or multiline_directive, or hereto_directive, or block_start, or block_end, or directive, or skipline',
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 6
+                                                                                                  'line' => 5
                                                                                                 }, 'Parse::RecDescent::Subrule' )
                                                                                        ],
                                                                             'line' => undef
@@ -4263,7 +4590,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                       'name' => 'statement',
                                                       'vars' => '',
                                                       'changed' => 0,
-                                                      'line' => 6
+                                                      'line' => 5
                                                     }, 'Parse::RecDescent::Rule' ),
                               'quote' => bless( {
                                                   'impcount' => 0,
@@ -4283,7 +4610,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                               'hashname' => '__DIRECTIVE1__',
                                                                                               'name' => '<perl_quotelike>',
                                                                                               'lookahead' => 0,
-                                                                                              'line' => 37,
+                                                                                              'line' => 42,
                                                                                               'code' => 'my ($match,@res);
 					 ($match,$text,undef,@res) =
 						  Text::Balanced::extract_quotelike($text,$skip);
@@ -4293,7 +4620,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                      bless( {
                                                                                               'hashname' => '__ACTION1__',
                                                                                               'lookahead' => 0,
-                                                                                              'line' => 37,
+                                                                                              'line' => 42,
                                                                                               'code' => '{ $item[1][2] }'
                                                                                             }, 'Parse::RecDescent::Action' )
                                                                                    ],
@@ -4303,11 +4630,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                   'name' => 'quote',
                                                   'vars' => '',
                                                   'changed' => 0,
-                                                  'line' => 37
+                                                  'line' => 42
                                                 }, 'Parse::RecDescent::Rule' ),
                               '_alternation_1_of_production_1_of_rule_statement' => bless( {
                                                                                              'impcount' => 0,
                                                                                              'calls' => [
+                                                                                                          'include',
                                                                                                           'multiline_directive',
                                                                                                           'hereto_directive',
                                                                                                           'block_start',
@@ -4327,12 +4655,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                                    'actcount' => 0,
                                                                                                                    'items' => [
                                                                                                                                 bless( {
-                                                                                                                                         'subrule' => 'multiline_directive',
+                                                                                                                                         'subrule' => 'include',
                                                                                                                                          'matchrule' => 0,
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 42
+                                                                                                                                         'line' => 46
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
                                                                                                                    'line' => undef
@@ -4347,18 +4675,38 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                                    'actcount' => 0,
                                                                                                                    'items' => [
                                                                                                                                 bless( {
+                                                                                                                                         'subrule' => 'multiline_directive',
+                                                                                                                                         'matchrule' => 0,
+                                                                                                                                         'implicit' => undef,
+                                                                                                                                         'argcode' => undef,
+                                                                                                                                         'lookahead' => 0,
+                                                                                                                                         'line' => 46
+                                                                                                                                       }, 'Parse::RecDescent::Subrule' )
+                                                                                                                              ],
+                                                                                                                   'line' => 46
+                                                                                                                 }, 'Parse::RecDescent::Production' ),
+                                                                                                          bless( {
+                                                                                                                   'number' => '2',
+                                                                                                                   'strcount' => 0,
+                                                                                                                   'dircount' => 0,
+                                                                                                                   'uncommit' => undef,
+                                                                                                                   'error' => undef,
+                                                                                                                   'patcount' => 0,
+                                                                                                                   'actcount' => 0,
+                                                                                                                   'items' => [
+                                                                                                                                bless( {
                                                                                                                                          'subrule' => 'hereto_directive',
                                                                                                                                          'matchrule' => 0,
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 42
+                                                                                                                                         'line' => 46
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 42
+                                                                                                                   'line' => 46
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
-                                                                                                                   'number' => '2',
+                                                                                                                   'number' => '3',
                                                                                                                    'strcount' => 0,
                                                                                                                    'dircount' => 0,
                                                                                                                    'uncommit' => undef,
@@ -4372,13 +4720,13 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 42
+                                                                                                                                         'line' => 46
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 42
+                                                                                                                   'line' => 46
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
-                                                                                                                   'number' => '3',
+                                                                                                                   'number' => '4',
                                                                                                                    'strcount' => 0,
                                                                                                                    'dircount' => 0,
                                                                                                                    'uncommit' => undef,
@@ -4392,13 +4740,13 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 42
+                                                                                                                                         'line' => 46
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 42
+                                                                                                                   'line' => 46
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
-                                                                                                                   'number' => '4',
+                                                                                                                   'number' => '5',
                                                                                                                    'strcount' => 0,
                                                                                                                    'dircount' => 0,
                                                                                                                    'uncommit' => undef,
@@ -4412,13 +4760,13 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 42
+                                                                                                                                         'line' => 46
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 42
+                                                                                                                   'line' => 46
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
-                                                                                                                   'number' => '5',
+                                                                                                                   'number' => '6',
                                                                                                                    'strcount' => 0,
                                                                                                                    'dircount' => 0,
                                                                                                                    'uncommit' => undef,
@@ -4432,16 +4780,16 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 42
+                                                                                                                                         'line' => 46
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 42
+                                                                                                                   'line' => 46
                                                                                                                  }, 'Parse::RecDescent::Production' )
                                                                                                         ],
                                                                                              'name' => '_alternation_1_of_production_1_of_rule_statement',
                                                                                              'vars' => '',
                                                                                              'changed' => 0,
-                                                                                             'line' => 42
+                                                                                             'line' => 46
                                                                                            }, 'Parse::RecDescent::Rule' ),
                               'hereto_line' => bless( {
                                                         'impcount' => 0,
@@ -4465,12 +4813,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                     'lookahead' => 0,
                                                                                                     'ldelim' => '/',
                                                                                                     'mod' => 'sm',
-                                                                                                    'line' => 31
+                                                                                                    'line' => 36
                                                                                                   }, 'Parse::RecDescent::Token' ),
                                                                                            bless( {
                                                                                                     'hashname' => '__ACTION1__',
                                                                                                     'lookahead' => 0,
-                                                                                                    'line' => 31,
+                                                                                                    'line' => 36,
                                                                                                     'code' => '{ $1 }'
                                                                                                   }, 'Parse::RecDescent::Action' )
                                                                                          ],
@@ -4480,7 +4828,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                         'name' => 'hereto_line',
                                                         'vars' => '',
                                                         'changed' => 0,
-                                                        'line' => 31
+                                                        'line' => 36
                                                       }, 'Parse::RecDescent::Rule' ),
                               'no_space' => bless( {
                                                      'impcount' => 0,
@@ -4504,7 +4852,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                  'lookahead' => 0,
                                                                                                  'ldelim' => '/',
                                                                                                  'mod' => '',
-                                                                                                 'line' => 38
+                                                                                                 'line' => 43
                                                                                                }, 'Parse::RecDescent::Token' )
                                                                                       ],
                                                                            'line' => undef
@@ -4513,7 +4861,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                      'name' => 'no_space',
                                                      'vars' => '',
                                                      'changed' => 0,
-                                                     'line' => 38
+                                                     'line' => 43
                                                    }, 'Parse::RecDescent::Rule' ),
                               'multiline_directive' => bless( {
                                                                 'impcount' => 0,
@@ -4539,7 +4887,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                             'lookahead' => 0,
                                                                                                             'ldelim' => '/',
                                                                                                             'mod' => '',
-                                                                                                            'line' => 9
+                                                                                                            'line' => 8
                                                                                                           }, 'Parse::RecDescent::Token' ),
                                                                                                    bless( {
                                                                                                             'subrule' => 'eol',
@@ -4547,12 +4895,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                             'implicit' => undef,
                                                                                                             'argcode' => undef,
                                                                                                             'lookahead' => 0,
-                                                                                                            'line' => 9
+                                                                                                            'line' => 8
                                                                                                           }, 'Parse::RecDescent::Subrule' ),
                                                                                                    bless( {
                                                                                                             'hashname' => '__ACTION1__',
                                                                                                             'lookahead' => 0,
-                                                                                                            'line' => 10,
+                                                                                                            'line' => 9,
                                                                                                             'code' => '{ $item[-2] =~ s/[\\\\][ \\t]*\\n//g; $return =
 			$thisparser->directive($item[-2] . "\\n",1, @arg) }'
                                                                                                           }, 'Parse::RecDescent::Action' )
@@ -4563,7 +4911,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                 'name' => 'multiline_directive',
                                                                 'vars' => '',
                                                                 'changed' => 0,
-                                                                'line' => 8
+                                                                'line' => 7
                                                               }, 'Parse::RecDescent::Rule' ),
                               'val' => bless( {
                                                 'impcount' => 0,
@@ -4588,7 +4936,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                             'implicit' => undef,
                                                                                             'argcode' => undef,
                                                                                             'lookahead' => 0,
-                                                                                            'line' => 35
+                                                                                            'line' => 40
                                                                                           }, 'Parse::RecDescent::Subrule' )
                                                                                  ],
                                                                       'line' => undef
@@ -4608,16 +4956,16 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                             'implicit' => undef,
                                                                                             'argcode' => undef,
                                                                                             'lookahead' => 0,
-                                                                                            'line' => 35
+                                                                                            'line' => 40
                                                                                           }, 'Parse::RecDescent::Subrule' )
                                                                                  ],
-                                                                      'line' => 35
+                                                                      'line' => 40
                                                                     }, 'Parse::RecDescent::Production' )
                                                            ],
                                                 'name' => 'val',
                                                 'vars' => '',
                                                 'changed' => 0,
-                                                'line' => 35
+                                                'line' => 40
                                               }, 'Parse::RecDescent::Rule' ),
                               'block_val' => bless( {
                                                       'impcount' => 0,
@@ -4641,7 +4989,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'implicit' => undef,
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 36
+                                                                                                  'line' => 41
                                                                                                 }, 'Parse::RecDescent::Subrule' )
                                                                                        ],
                                                                             'line' => undef
@@ -4663,16 +5011,16 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'lookahead' => 0,
                                                                                                   'ldelim' => '/',
                                                                                                   'mod' => '',
-                                                                                                  'line' => 36
+                                                                                                  'line' => 41
                                                                                                 }, 'Parse::RecDescent::Token' )
                                                                                        ],
-                                                                            'line' => 36
+                                                                            'line' => 41
                                                                           }, 'Parse::RecDescent::Production' )
                                                                  ],
                                                       'name' => 'block_val',
                                                       'vars' => '',
                                                       'changed' => 0,
-                                                      'line' => 36
+                                                      'line' => 41
                                                     }, 'Parse::RecDescent::Rule' ),
                               'hereto_directive' => bless( {
                                                              'impcount' => 0,
@@ -4699,14 +5047,14 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                          'implicit' => undef,
                                                                                                          'argcode' => undef,
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 14
+                                                                                                         'line' => 13
                                                                                                        }, 'Parse::RecDescent::Subrule' ),
                                                                                                 bless( {
                                                                                                          'pattern' => '<<',
                                                                                                          'hashname' => '__STRING1__',
                                                                                                          'description' => '\'<<\'',
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 14
+                                                                                                         'line' => 13
                                                                                                        }, 'Parse::RecDescent::Literal' ),
                                                                                                 bless( {
                                                                                                          'subrule' => 'hereto_mark',
@@ -4714,7 +5062,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                          'implicit' => undef,
                                                                                                          'argcode' => undef,
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 14
+                                                                                                         'line' => 13
                                                                                                        }, 'Parse::RecDescent::Subrule' ),
                                                                                                 bless( {
                                                                                                          'subrule' => 'eol',
@@ -4722,13 +5070,13 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                          'implicit' => undef,
                                                                                                          'argcode' => undef,
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 14
+                                                                                                         'line' => 13
                                                                                                        }, 'Parse::RecDescent::Subrule' ),
                                                                                                 bless( {
                                                                                                          'hashname' => '__DIRECTIVE1__',
                                                                                                          'name' => '<skip: \'\'>',
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 14,
+                                                                                                         'line' => 13,
                                                                                                          'code' => 'my $oldskip = $skip; $skip= \'\'; $oldskip'
                                                                                                        }, 'Parse::RecDescent::Directive' ),
                                                                                                 bless( {
@@ -4737,7 +5085,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                          'implicit' => undef,
                                                                                                          'argcode' => '[$item[3]]',
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 14
+                                                                                                         'line' => 13
                                                                                                        }, 'Parse::RecDescent::Subrule' ),
                                                                                                 bless( {
                                                                                                          'subrule' => 'eol',
@@ -4745,12 +5093,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                          'implicit' => undef,
                                                                                                          'argcode' => undef,
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 14
+                                                                                                         'line' => 13
                                                                                                        }, 'Parse::RecDescent::Subrule' ),
                                                                                                 bless( {
                                                                                                          'hashname' => '__ACTION1__',
                                                                                                          'lookahead' => 0,
-                                                                                                         'line' => 15,
+                                                                                                         'line' => 14,
                                                                                                          'code' => '{ $data->newDirective($item[1], [$item[6]]) }'
                                                                                                        }, 'Parse::RecDescent::Action' )
                                                                                               ],
@@ -4760,7 +5108,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                              'name' => 'hereto_directive',
                                                              'vars' => '',
                                                              'changed' => 0,
-                                                             'line' => 13
+                                                             'line' => 12
                                                            }, 'Parse::RecDescent::Rule' ),
                               'grammar' => bless( {
                                                     'impcount' => 0,
@@ -4782,14 +5130,14 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                        bless( {
                                                                                                 'hashname' => '__ACTION1__',
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 4,
+                                                                                                'line' => 3,
                                                                                                 'code' => '{ $data = $arg[0]; }'
                                                                                               }, 'Parse::RecDescent::Action' ),
                                                                                        bless( {
                                                                                                 'hashname' => '__DIRECTIVE1__',
                                                                                                 'name' => '<reject>',
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 4
+                                                                                                'line' => 3
                                                                                               }, 'Parse::RecDescent::UncondReject' )
                                                                                      ],
                                                                           'line' => undef
@@ -4812,7 +5160,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                 'matchrule' => 0,
                                                                                                 'repspec' => 's?',
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 4
+                                                                                                'line' => 3
                                                                                               }, 'Parse::RecDescent::Repetition' ),
                                                                                        bless( {
                                                                                                 'subrule' => 'eof',
@@ -4820,22 +5168,22 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                 'implicit' => undef,
                                                                                                 'argcode' => undef,
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 4
+                                                                                                'line' => 3
                                                                                               }, 'Parse::RecDescent::Subrule' ),
                                                                                        bless( {
                                                                                                 'hashname' => '__ACTION1__',
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 4,
+                                                                                                'line' => 3,
                                                                                                 'code' => '{ $data->end() }'
                                                                                               }, 'Parse::RecDescent::Action' )
                                                                                      ],
-                                                                          'line' => 4
+                                                                          'line' => 3
                                                                         }, 'Parse::RecDescent::Production' )
                                                                ],
                                                     'name' => 'grammar',
                                                     'vars' => '',
                                                     'changed' => 0,
-                                                    'line' => 4
+                                                    'line' => 3
                                                   }, 'Parse::RecDescent::Rule' ),
                               'comment' => bless( {
                                                     'impcount' => 0,
@@ -4858,7 +5206,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                 'hashname' => '__STRING1__',
                                                                                                 'description' => '\'#\'',
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 33
+                                                                                                'line' => 38
                                                                                               }, 'Parse::RecDescent::Literal' ),
                                                                                        bless( {
                                                                                                 'description' => '/.*/',
@@ -4868,7 +5216,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                 'lookahead' => 0,
                                                                                                 'ldelim' => '/',
                                                                                                 'mod' => '',
-                                                                                                'line' => 33
+                                                                                                'line' => 38
                                                                                               }, 'Parse::RecDescent::Token' ),
                                                                                        bless( {
                                                                                                 'subrule' => 'eol',
@@ -4876,12 +5224,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                 'implicit' => undef,
                                                                                                 'argcode' => undef,
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 33
+                                                                                                'line' => 38
                                                                                               }, 'Parse::RecDescent::Subrule' ),
                                                                                        bless( {
                                                                                                 'hashname' => '__ACTION1__',
                                                                                                 'lookahead' => 0,
-                                                                                                'line' => 33,
+                                                                                                'line' => 38,
                                                                                                 'code' => '{ 0 }'
                                                                                               }, 'Parse::RecDescent::Action' )
                                                                                      ],
@@ -4891,7 +5239,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                     'name' => 'comment',
                                                     'vars' => '',
                                                     'changed' => 0,
-                                                    'line' => 33
+                                                    'line' => 38
                                                   }, 'Parse::RecDescent::Rule' ),
                               'eof' => bless( {
                                                 'impcount' => 0,
@@ -4915,7 +5263,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                             'lookahead' => 0,
                                                                                             'ldelim' => '/',
                                                                                             'mod' => '',
-                                                                                            'line' => 40
+                                                                                            'line' => 45
                                                                                           }, 'Parse::RecDescent::Token' )
                                                                                  ],
                                                                       'line' => undef
@@ -4924,7 +5272,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                 'name' => 'eof',
                                                 'vars' => '',
                                                 'changed' => 0,
-                                                'line' => 40
+                                                'line' => 45
                                               }, 'Parse::RecDescent::Rule' ),
                               'block_end' => bless( {
                                                       'impcount' => 0,
@@ -4948,7 +5296,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'hashname' => '__STRING1__',
                                                                                                   'description' => '\'</\'',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 24
+                                                                                                  'line' => 23
                                                                                                 }, 'Parse::RecDescent::Literal' ),
                                                                                          bless( {
                                                                                                   'subrule' => 'key',
@@ -4956,14 +5304,14 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'implicit' => undef,
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 24
+                                                                                                  'line' => 23
                                                                                                 }, 'Parse::RecDescent::Subrule' ),
                                                                                          bless( {
                                                                                                   'pattern' => '>',
                                                                                                   'hashname' => '__STRING2__',
                                                                                                   'description' => '\'>\'',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 24
+                                                                                                  'line' => 23
                                                                                                 }, 'Parse::RecDescent::Literal' ),
                                                                                          bless( {
                                                                                                   'subrule' => 'eol',
@@ -4971,12 +5319,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'implicit' => undef,
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 24
+                                                                                                  'line' => 23
                                                                                                 }, 'Parse::RecDescent::Subrule' ),
                                                                                          bless( {
                                                                                                   'hashname' => '__ACTION1__',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 25,
+                                                                                                  'line' => 24,
                                                                                                   'code' => '{ $data->endBlock($item[2]) }'
                                                                                                 }, 'Parse::RecDescent::Action' )
                                                                                        ],
@@ -4986,7 +5334,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                       'name' => 'block_end',
                                                       'vars' => '',
                                                       'changed' => 0,
-                                                      'line' => 24
+                                                      'line' => 23
                                                     }, 'Parse::RecDescent::Rule' ),
                               'directive' => bless( {
                                                       'impcount' => 0,
@@ -5012,7 +5360,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'implicit' => undef,
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 17
+                                                                                                  'line' => 16
                                                                                                 }, 'Parse::RecDescent::Subrule' ),
                                                                                          bless( {
                                                                                                   'subrule' => 'val',
@@ -5023,13 +5371,13 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'matchrule' => 0,
                                                                                                   'repspec' => 's',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 17
+                                                                                                  'line' => 16
                                                                                                 }, 'Parse::RecDescent::Repetition' ),
                                                                                          bless( {
                                                                                                   'hashname' => '__DIRECTIVE1__',
                                                                                                   'name' => '<commit>',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 17,
+                                                                                                  'line' => 16,
                                                                                                   'code' => '$commit = 1'
                                                                                                 }, 'Parse::RecDescent::Directive' ),
                                                                                          bless( {
@@ -5038,12 +5386,12 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'implicit' => undef,
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 17
+                                                                                                  'line' => 16
                                                                                                 }, 'Parse::RecDescent::Subrule' ),
                                                                                          bless( {
                                                                                                   'hashname' => '__ACTION1__',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 17,
+                                                                                                  'line' => 16,
                                                                                                   'code' => '{ $data->newDirective($item[1], $item[2]) }'
                                                                                                 }, 'Parse::RecDescent::Action' )
                                                                                        ],
@@ -5064,7 +5412,7 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'implicit' => undef,
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 18
+                                                                                                  'line' => 17
                                                                                                 }, 'Parse::RecDescent::Subrule' ),
                                                                                          bless( {
                                                                                                   'subrule' => 'eol',
@@ -5072,22 +5420,22 @@ package Config::ApacheExtended::Parser; sub new { my $self = bless( {
                                                                                                   'implicit' => undef,
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 18
+                                                                                                  'line' => 17
                                                                                                 }, 'Parse::RecDescent::Subrule' ),
                                                                                          bless( {
                                                                                                   'hashname' => '__ACTION1__',
                                                                                                   'lookahead' => 0,
-                                                                                                  'line' => 18,
+                                                                                                  'line' => 17,
                                                                                                   'code' => '{ $data->newDirective($item[1], [1]) }'
                                                                                                 }, 'Parse::RecDescent::Action' )
                                                                                        ],
-                                                                            'line' => 18
+                                                                            'line' => 17
                                                                           }, 'Parse::RecDescent::Production' )
                                                                  ],
                                                       'name' => 'directive',
                                                       'vars' => '',
                                                       'changed' => 0,
-                                                      'line' => 17
+                                                      'line' => 16
                                                     }, 'Parse::RecDescent::Rule' )
                             }
                }, 'Parse::RecDescent' );

@@ -2,71 +2,65 @@
 
 # t/003_get.t - Makes sure that we can retrieve values using get.
 
-use Test::More tests => 28;
-use Data::Dumper;
+use Test::More tests => 27;
 use Config::ApacheExtended;
-my $conf = Config::ApacheExtended->new(source => "t/parse.conf", ignore_case => 0);
 
-# test 1
-ok($conf);
+my $conf = Config::ApacheExtended->new(
+	source		=> "t/parse.conf",
+	ignore_case	=> 0,
+);
 
-# test 2
-isa_ok($conf, 'Config::ApacheExtended');
 
-# test 3
-ok($conf->parse);
+ok($conf);												# test 1
+ok($conf->parse);										# test 2
 
-# tests 4-5
 my $noval = $conf->get('NoVal');
-ok($noval);
-is($noval,1);
-
-# tests 6-11
 my @bar = $conf->get('Bar');
 my $bar = $conf->get('Bar');
-ok(@bar);
-ok($bar);
-is(scalar(@bar),2);
-is(ref($bar), 'ARRAY');
-is($bar[0], 'baz');
-is($bar[1], 'bang');
-
-# tests 12-13
 my $smulti = $conf->get('SingleValMultiLine');
-ok($smulti);
-is($smulti,'Single value across lines');
-
-# tests 14-20
 my @mmulti = $conf->get('MultilineTest');
 my $mmulti = $conf->get('MultilineTest');
-ok(@mmulti);
-ok($mmulti);
-is(scalar(@mmulti), 3);
-is(ref($mmulti), 'ARRAY');
-is($mmulti[0], 'Multi');
-is($mmulti[1], 'values');
-is($mmulti[2], 'across lines');
-
-# tests 21-22
 my $hereto = $conf->get('HeretoTest');
-ok($hereto);
-is($hereto, "These lines are inserted\nverbatim into HeretoTest\nvariable expansion to come.\n");
-
-# tests 23-24
 my $foo = $conf->get('Foo');
-ok($foo);
-is($foo, 'bar');
-
-# test 25
 my $foobar = $conf->get('FooBar');
-ok(!$foobar);
+my @keys = $conf->get();
+my $foocs = $conf->get('foo');
+
+ok($noval);												# test 3
+is($noval,1);											# test 4
+
+ok(@bar);												# test 5
+ok($bar);												# test 6
+is(scalar(@bar),2);										# test 7
+is(ref($bar), 'ARRAY');									# test 8
+is($bar[0], 'baz');										# test 9
+is($bar[1], 'bang');									# test 10
+
+ok($smulti);											# test 11
+is($smulti,'Single value across lines');				# test 12
+
+ok(@mmulti);											# test 13
+ok($mmulti);											# test 14
+is(scalar(@mmulti), 3);									# test 15
+is(ref($mmulti), 'ARRAY');								# test 16
+is($mmulti[0], 'Multi');								# test 17
+is($mmulti[1], 'values');								# test 18
+is($mmulti[2], 'across lines');							# test 19
+
+ok($hereto);											# test 20
+is($hereto,
+	"These lines are inserted\n" .
+	"verbatim into HeretoTest\n" .
+	"variable expansion to come.\n"
+);														# test 21
+
+ok($foo);												# test 22
+is($foo, 'bar');										# test 23
+
+ok(!$foobar);											# test 24
 
 # tests 26-27
-my @keys = $conf->get();
-ok(@keys);
-#diag("Keys: [" . join(",",@keys) . "]");
-is(scalar(@keys), 6);
+ok(@keys);												# test 25
+is(scalar(@keys), 6);									# test 26
 
-# tests 28
-my $foocs = $conf->get('foo');
-ok(!$foocs);
+ok(!$foocs);											# tests 27

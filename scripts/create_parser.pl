@@ -1,29 +1,18 @@
 #!/usr/bin/perl
 
 use strict;
-use vars qw($libdir);
-BEGIN
-{
-if ( -d './lib' )
-{
-	push(@INC, './lib');
-	$libdir = './lib';
-}
-elsif ( -d '../lib' )
-{
-	push(@INC, '../lib');
-	$libdir = '../lib';
-}
-else
-{
-	die "Could not find lib directory which contains Config::ApacheExtended";
-}
-}
-
-use Config::ApacheExtended;
-
 use Parse::RecDescent;
+my $libdir;
+my $grammarfile;
 
-Parse::RecDescent->Precompile(join('',<Config::ApacheExtended::DATA>), "Config::ApacheExtended::Parser");
-link "./Parser.pm","$libdir/Config/ApacheExtended/Parser.pm";
-unlink "./Parser.pm";
+my($dest,$grammar,$package) = @ARGV[0..2];
+
+open(GRAMMAR,"<$grammar") or die "Could not open [ $grammar ] : $!\n";
+
+Parse::RecDescent->Precompile(join('',<GRAMMAR>), $package );
+my @parts = split(/::/,$package);
+my $file = $parts[-1] . ".pm";
+my $dfile = sprintf('%s/%s/%s', $dest, join('/', @parts[0..$#parts - 1]), $file);
+unlink $dfile if -e $dfile;
+link "./$file", $dfile;
+unlink "./$file";

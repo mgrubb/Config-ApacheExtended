@@ -2,34 +2,33 @@
 
 # t/006_expandvars.t - Tests the variable expansion feature
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 use Config::ApacheExtended;
-my $conf = Config::ApacheExtended->new(source => "t/expandvars.conf", expand_vars => 1, inherit_vals => 1);
+my $conf = Config::ApacheExtended->new(
+	source			=> "t/expandvars.conf",
+	expand_vars		=> 1,
+	inherit_vals	=> 1,
+);
 
-# test 1
-ok($conf);
 
-# test 2
-isa_ok($conf, 'Config::ApacheExtended');
+ok($conf);														# test 1
+ok($conf->parse);												# test 2
 
-# test 3
-ok($conf->parse);
-
-# tests 4-7
 my $foo = $conf->get('Foo');
-ok($foo);
-is($foo, 'bar');
 my $thisfoo = $conf->get('ThisFoo');
-ok($thisfoo);
-is($thisfoo,$foo);
-
-# tests 8-12
 my @bar = $conf->get( 'Bar' );
 my $block = $conf->block( FooBar => 'baz test' );
 my $boom = $block->get('Boom');
-ok($block);
-ok(@bar);
-is(scalar(@bar), 2);
 my $cstr = join($", @bar);
-ok($boom);
-is($boom, $cstr);
+
+ok($foo);														# test 3
+is($foo, 'bar');												# test 4
+ok($thisfoo);													# test 5
+is($thisfoo,$foo);												# test 6
+
+
+ok($block);														# test 7
+ok(@bar);														# test 8
+is(scalar(@bar), 2);											# test 9
+ok($boom);														# test 10
+is($boom, $cstr);												# test 11

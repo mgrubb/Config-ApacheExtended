@@ -1,11 +1,13 @@
 package Config::ApacheExtended;
 
 use Parse::RecDescent;
-use Config::ApacheExtended::ParseTree;
+use Config::ApacheExtended::Grammar;
+#use Config::ApacheExtended::ParseTree;
 use IO::File;
 use Scalar::Util qw(weaken);
 use Text::Balanced qw(extract_variable);
-use File::Spec qw(rel2abs);
+use File::Spec::Functions qw(splitpath catpath abs2rel rel2abs file_name_is_absolute);
+use Carp qw(croak cluck);
 
 use strict;
 BEGIN {
@@ -91,92 +93,193 @@ See Also   :
 =cut
 
 ################################################## subroutine header end ##
-$::RD_HINT = 1 if $DEBUG;
-$::RD_TRACE = 1 if $DEBUG;
 
-sub new
 {
-	my $class = shift;
-	my %default_parameters = (
-		expand_vars		=> 0,
-		relative_path	=> undef,
-		honor_include	=> 1,
-		inherit_vals	=> 0,
-		ignore_case		=> 1,
-		die_on_nokey	=> 0,
-		die_on_noblock	=> 1,
-		valid_keys		=> [],
-		valid_blocks	=> [],
-		source			=> undef,
-		_prev_blocks	=> [],
-		_data			=> {},
+	my %_def_params = (
+		_expand_vars	=> 0,
+		_conf_root	=> undef,
+		_root_directive	=> undef,
+		_honor_include	=> 1,
+		_inherit_vals	=> 0,
+		_ignore_case	=> 1,
+		_die_on_nokey	=> 0,
+		_die_on_noblock	=> 0,
+		_valid_keys		=> undef,
+		_valid_blocks	=> undef,
+		_source			=> undef,
 	);
 
-	my $self = bless ({%default_parameters,@_}, ref ($class) || $class);
-	$self->_normalize_source();
+	sub _default_parameters { %_def_params; }
+}
+	
+sub new
+{
+	my $cl = shift;
+	my %args = @_;
+	my $class = ref($cl) || $cl;
+
+	my $self = {
+		ref($cl) ? %$cl : $class->_default_parameters(),
+		(map { ("_$_" => $args{$_}) } keys %args),
+		_data	=> {},
+	};
+
+	bless($self,$class);		
+	($self->{_source},$self->{_conf_root}) = _resolveSource($self->{_source}, $self->{_conf_root});
 	return $self;
 }
 
-sub _normalize_source
+sub _resolveSource
 {
-	my $self = shift;
-	my $source = shift || $self->{source};
-	return unless defined $source;
+	my $source = shift;
+	my $root = shift;
+	my $conf_root;
 
-	if ( (ref($source) eq 'GLOB') || (ref($source) eq 'IO::File') )
+	return unless defined($source);
+
+	if ( !file_name_is_absolute($source) )
 	{
-		$self->{_filename} = undef;
-		$self->{_contents} = join('', <$source>);
+		$source = rel2abs($source, $root);
 	}
-	elsif ( ref($source) eq 'SCALAR' )
-	{
-		$self->{_filename} = undef;
-		$self->{_contents} = \$source;
-	}
-	else
-	{
-		require File::Basename;
-		$self->{_filename} = $source;
-		my $content = IO::File->new("< $source");
-		$self->{_contents} = join('', <$content>);
-		$content->close();
-		$self->{relative_path} ||= File::Basename::dirname($source);
-	}
-	$self->{source} = undef;
-	$self->{relative_path} ||= rel2abs($0);
-	
+
+	my @path_parts;
+	@path_parts = splitpath($source);
+	$path_parts[-1] = '';
+	$conf_root = defined($root) ? $root : catpath(@path_parts);
+
+	return ($source,$conf_root);
 }
 
 sub parse
 {
 	my $self = shift;
 	my $source = shift;
+	$self->{_current_block}		= $self->{_data};
+	$self->{_previous_blocks}	= [];
+
+	my $contents;
+
 	if ( defined($source) && (ref($source) eq 'SCALAR' ) )
 	{
-		$self->{_contents} = \$source;
+		$contents = \$source;
 	}
-	elsif( defined($source) )
+	elsif ( defined($source) && ref($source) =~ m/GLOB|IO::File/ )
 	{
-		$self->normalize_source($source);
-	}
-	
-	my $parser = Parse::RecDescent->new(join('', <DATA>));
-#	my $result = $self->{_parser}->grammar($self->{_contents},1,$self);
-	my $parse_tree = Config::ApacheExtended::ParseTree->new(ignore_case => $self->{ignore_case}, honor_include => $self->{honor_include});
-	my $result = $parser->grammar($self->{_contents},1,$parse_tree);
-	if ( defined($result) )
-	{
-#		print "Parse Successful!\n";
+		$contents = join('', <$source>);
 	}
 	else
 	{
-#		print "Parse Unsuccessful!\n";
+		my $fh = IO::File->new($self->{_source}, "r") or croak "Could not open source [ " . $self->{_source} . " ] : $!\n";
+		$contents = join('', <$fh>);
+		$fh->close();
+	}
+	
+#	my $parser = Parse::RecDescent->new(join('', <DATA>));
+	my $parser = Config::ApacheExtended::Grammar->new();
+
+	my $result = $parser->grammar($contents,1,$self);
+
+	unless ( defined($result) )
+	{
 		return undef;
 	}
-	$self->{_data} = $parse_tree->getData();
-	$self->_substituteValues() if $self->{expand_vars};
-	return $parse_tree;
-#	$self->_transliterateBlocks($result->getData);
+
+	delete $self->{_current_block};
+	delete $self->{_previous_blocks};
+
+	$self->_substituteValues() if $self->{_expand_vars};
+	return scalar(keys(%{$self->{_data}}));
+}
+
+sub include
+{
+	return $_[0]->{_honor_include};
+}
+
+sub _loadFile
+{
+	my $self = shift;
+	my $file = shift;
+	my $contents = "";
+	$file = (_resolveSource($file,$self->{_conf_root}))[0];
+	if ( -d $file )
+	{
+		opendir(INCD, $file) or cluck("Error opening include directory [ $file ] : $!\n");
+		my @files = map { "$file/$_" } grep { -f "$file/$_" } readdir(INCD);
+		closedir(INCD);
+		$contents .= $self->_loadFile($_) for @files;
+	}
+	elsif ( -r $file )
+	{
+		my $fh = IO::File->new($file, "r");
+		unless ( $fh )
+		{
+			cluck("Could not open [ $file ] for reading: $!\n");
+			return '';
+		}
+		else
+		{
+			local $/ = undef;
+			$contents = <$fh>;
+		}
+	}
+	else
+	{
+		cluck("Could not find file [ $file ]\n");
+		return '';
+	}
+
+#	open(TMP, '>/tmp/contents.txt');
+#	print TMP $contents;
+#	close(TMP);
+	return $contents;
+}
+
+sub newDirective
+{
+	my $self = shift;
+	my($dir,$vals) = @_;
+	$dir = lc $dir if $self->{_ignore_case};
+	$self->{_current_block}->{$dir} = $vals;
+	if ( defined($self->{_root_directive}) && $self->{_root_directive} eq $dir )
+	{
+		$self->{_root_directive} = $vals->[0];
+	}
+}
+
+sub beginBlock
+{
+	my $self = shift;
+	my($block,$vals) = @_;
+	$block = lc $block if $self->{_ignore_case};
+	my $ident = $block;
+	if ( defined($vals) && @$vals )
+	{
+		$ident = shift @$vals;
+		$ident = lc $ident if $self->{_ignore_case};
+	}
+	my $new_block = {};
+	$self->{_current_block}->{$block}->{$ident} = $new_block;
+	push(@{$self->{_previous_blocks}}, $self->{_current_block});
+	$self->{_current_block} = $new_block;
+	return 1;
+}
+
+sub endBlock
+{
+	my $self = shift;
+	if ( @{$self->{_previous_blocks}} )
+	{
+		$self->{_current_block} = pop @{$self->{_previous_blocks}};
+	}
+
+	return 1;
+}
+
+sub end
+{
+	$_[0]->{_current_block} = undef;
+	return 1;
 }
 
 sub _substituteValues
@@ -196,7 +299,7 @@ sub _substituteValues
 				$idx ||= 0;
 				my $pattern;
 				($pattern = $varspec) =~ s/([^\w\s])/\\$1/g;
-				$var = $self->{ignore_case} ? lc $var : $var;
+				$var = $self->{_ignore_case} ? lc $var : $var;
 				my @lval = $self->get($var);
 				if ( !@lval )
 				{
@@ -230,7 +333,7 @@ sub get
 		return grep { ref($data->{$_}) ne 'HASH' } keys(%$data);
 	}
 
-	$key = lc $key if $self->{ignore_case};
+	$key = lc $key if $self->{_ignore_case};
 	return undef if ref($data->{$key}) eq 'HASH';
 
 	if ( exists($data->{$key}) )
@@ -244,7 +347,7 @@ sub get
 			return wantarray ? @{$data->{$key}} : \@{$data->{$key}};
 		}
 	}
-	elsif ( $self->{inherit_vals} && exists($self->{_parent}) )
+	elsif ( $self->{_inherit_vals} && exists($self->{_parent}) )
 	{
 		return wantarray ? ($self->{_parent}->get($key)) : $self->{_parent}->get($key);
 	}
@@ -290,54 +393,9 @@ sub _createBlock
 	my $data = shift;
 	my $block = bless { %{$self} }, ref($self);
 	$block->{_data} = {%$data};
-	$block->{_parent} = $self->{inherit_vals} ? $self : weaken($self);
-	$block->_substituteValues() if $self->{expand_vars};
+	$block->{_parent} = $self->{_inherit_vals} ? $self : weaken($self);
+	$block->_substituteValues() if $self->{_expand_vars};
 	return $block;
 }
 
 1;
-
-__DATA__
-
-{ my $data; }
-
-grammar: { $data = $arg[0]; } <reject> | statement(s?) eof { $data->end() }
-
-statement: <skip: qr/[ \t]*/> (include|multiline_directive|hereto_directive|block_start|block_end|directive|skipline)
-
-multiline_directive:
-	/(.*?[\\][ \t]*\n)+.*/ eol
-		{ $item[-2] =~ s/[\\][ \t]*\n//g; $return =
-			$thisparser->directive($item[-2] . "\n",1, @arg) }
-
-hereto_directive:
-	key '<<' hereto_mark eol <skip: ''> hereto_line[$item[3]] eol
-		{ $data->newDirective($item[1], [$item[6]]) }
-
-directive:	key val(s) <commit> eol { $data->newDirective($item[1], $item[2]) }
-			| key eol { $data->newDirective($item[1], [1]) }
-
-block_start:
-	'<' key block_val(s?) '>' eol 
-		{ $data->beginBlock($item[2], $item[3]) }
-
-block_end: '</' key '>' eol
-		{ $data->endBlock($item[2]) }
-
-include: /\b(?i)include\b/ val eol { if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text} else { $data->newDirective($item[1],$item[1])} }
-
-skipline: comment | eol { 0 }
-
-
-hereto_mark: val
-hereto_line: /(.*?)$arg[0]/sm { $1 }
-
-comment: '#' /.*/ eol { 0 }
-key: /\w+/
-val: quote | no_space
-block_val: quote | /[^\s>]+/
-quote: <perl_quotelike> { $item[1][2] }
-no_space: /\S+/
-eol: /\n/
-eof: /\z/
-

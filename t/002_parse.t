@@ -6,7 +6,9 @@ use Test::More tests => 3;
 
 use Config::ApacheExtended;
 my $conf = Config::ApacheExtended->new(source => "t/parse.conf");
+
+ok($conf);							# test 1
 my $pt = $conf->parse();
-ok($pt);
-isa_ok($pt, 'Config::ApacheExtended::ParseTree');
-is(scalar(keys(%{$pt->getData})), 7);
+
+ok(defined($pt));					# test 2
+is($pt,7);							# test 3

@@ -4,6 +4,7 @@
 
 use Test::More tests => 12;
 use Config::ApacheExtended;
+
 my $conf = Config::ApacheExtended->new(source => "t/parse.conf");
 
 ok($conf);													# test 1

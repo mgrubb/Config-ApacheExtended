@@ -650,7 +650,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::include
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text; print "$text\n"; } else { $return = undef; } };
+		$_tok = ($_noactions) ? 0 : do { if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text; } else { $return = undef; } };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -915,7 +915,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::block_start
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { $data->beginBlock($item[2], $item[3]) };
+		$_tok = ($_noactions) ? 0 : do { $return = $data->beginBlock($item[2], $item[3]) };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -3258,7 +3258,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::grammar
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { $data->end() };
+		$_tok = ($_noactions) ? 0 : do { $item[2] };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -3572,7 +3572,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::eof
 	while (!$_matched && !$commit)
 	{
 		
-		Parse::RecDescent::_trace(q{Trying production: [/\\z/]},
+		Parse::RecDescent::_trace(q{Trying production: [/^\\z/]},
 					  Parse::RecDescent::_tracefirst($_[1]),
 					  q{eof},
 					  $tracelevel)
@@ -3585,7 +3585,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::eof
 		my $repcount = 0;
 
 
-		Parse::RecDescent::_trace(q{Trying terminal: [/\\z/]}, Parse::RecDescent::_tracefirst($text),
+		Parse::RecDescent::_trace(q{Trying terminal: [/^\\z/]}, Parse::RecDescent::_tracefirst($text),
 					  q{eof},
 					  $tracelevel)
 						if defined $::RD_TRACE;
@@ -3593,7 +3593,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::eof
 		$expectation->is(q{})->at($text);
 		
 
-		unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ s/\A(?:\z)//)
+		unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ s/\A(?:^\z)//)
 		{
 			
 			$expectation->failed();
@@ -3611,7 +3611,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::eof
 		
 
 
-		Parse::RecDescent::_trace(q{>>Matched production: [/\\z/]<<},
+		Parse::RecDescent::_trace(q{>>Matched production: [/^\\z/]<<},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{eof},
 					  $tracelevel)
@@ -3832,7 +3832,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::block_end
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { $data->endBlock($item[2]) };
+		$_tok = ($_noactions) ? 0 : do { $return = $data->endBlock($item[2]) };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -4073,7 +4073,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::directive
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { $data->newDirective($item[1], $item[2]) };
+		$_tok = ($_noactions) ? 0 : do { $return = $data->newDirective($item[1], $item[2]) };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -4182,7 +4182,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::directive
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { $data->newDirective($item[1], [1]) };
+		$_tok = ($_noactions) ? 0 : do { $return = $data->newDirective($item[1], [1]) };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -4434,7 +4434,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                 'hashname' => '__ACTION1__',
                                                                                                 'lookahead' => 0,
                                                                                                 'line' => 27,
-                                                                                                'code' => '{ if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text; print "$text\\n"; } else { $return = undef; } }'
+                                                                                                'code' => '{ if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text; } else { $return = undef; } }'
                                                                                               }, 'Parse::RecDescent::Action' )
                                                                                      ],
                                                                           'line' => undef
@@ -4508,7 +4508,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                     'hashname' => '__ACTION1__',
                                                                                                     'lookahead' => 0,
                                                                                                     'line' => 21,
-                                                                                                    'code' => '{ $data->beginBlock($item[2], $item[3]) }'
+                                                                                                    'code' => '{ $return = $data->beginBlock($item[2], $item[3]) }'
                                                                                                   }, 'Parse::RecDescent::Action' )
                                                                                          ],
                                                                               'line' => undef
@@ -5174,7 +5174,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                 'hashname' => '__ACTION1__',
                                                                                                 'lookahead' => 0,
                                                                                                 'line' => 3,
-                                                                                                'code' => '{ $data->end() }'
+                                                                                                'code' => '{ $item[2] }'
                                                                                               }, 'Parse::RecDescent::Action' )
                                                                                      ],
                                                                           'line' => 3
@@ -5256,9 +5256,9 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                       'actcount' => 0,
                                                                       'items' => [
                                                                                    bless( {
-                                                                                            'description' => '/\\\\z/',
+                                                                                            'description' => '/^\\\\z/',
                                                                                             'rdelim' => '/',
-                                                                                            'pattern' => '\\z',
+                                                                                            'pattern' => '^\\z',
                                                                                             'hashname' => '__PATTERN1__',
                                                                                             'lookahead' => 0,
                                                                                             'ldelim' => '/',
@@ -5325,7 +5325,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                   'hashname' => '__ACTION1__',
                                                                                                   'lookahead' => 0,
                                                                                                   'line' => 24,
-                                                                                                  'code' => '{ $data->endBlock($item[2]) }'
+                                                                                                  'code' => '{ $return = $data->endBlock($item[2]) }'
                                                                                                 }, 'Parse::RecDescent::Action' )
                                                                                        ],
                                                                             'line' => undef
@@ -5392,7 +5392,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                   'hashname' => '__ACTION1__',
                                                                                                   'lookahead' => 0,
                                                                                                   'line' => 16,
-                                                                                                  'code' => '{ $data->newDirective($item[1], $item[2]) }'
+                                                                                                  'code' => '{ $return = $data->newDirective($item[1], $item[2]) }'
                                                                                                 }, 'Parse::RecDescent::Action' )
                                                                                        ],
                                                                             'line' => undef
@@ -5426,7 +5426,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                   'hashname' => '__ACTION1__',
                                                                                                   'lookahead' => 0,
                                                                                                   'line' => 17,
-                                                                                                  'code' => '{ $data->newDirective($item[1], [1]) }'
+                                                                                                  'code' => '{ $return = $data->newDirective($item[1], [1]) }'
                                                                                                 }, 'Parse::RecDescent::Action' )
                                                                                        ],
                                                                             'line' => 17

@@ -96,17 +96,17 @@ See Also   :
 
 {
 	my %_def_params = (
-		_expand_vars	=> 0,
-		_conf_root	=> undef,
-		_root_directive	=> undef,
-		_honor_include	=> 1,
-		_inherit_vals	=> 0,
-		_ignore_case	=> 1,
-		_die_on_nokey	=> 0,
-		_die_on_noblock	=> 0,
-		_valid_keys		=> undef,
-		_valid_blocks	=> undef,
-		_source			=> undef,
+		_expand_vars		=> 0,
+		_conf_root			=> undef,
+		_root_directive		=> undef,
+		_honor_include		=> 1,
+		_inherit_vals		=> 0,
+		_ignore_case		=> 1,
+		_die_on_nokey		=> 0,
+		_die_on_noblock		=> 0,
+		_valid_directives	=> undef,
+		_valid_blocks		=> undef,
+		_source				=> undef,
 	);
 
 	sub _default_parameters { %_def_params; }
@@ -123,6 +123,12 @@ sub new
 		(map { ("_$_" => $args{$_}) } keys %args),
 		_data	=> {},
 	};
+
+	# automatically add the root_directive to the valid_directives list if there is one.
+	if ( defined($self->{_valid_directives}) && defined($self->{_root_directive}) )
+	{
+		push(@{$self->{_valid_directives}}, $self->{_root_directive});
+	}
 
 	bless($self,$class);		
 	($self->{_source},$self->{_conf_root}) = _resolveSource($self->{_source}, $self->{_conf_root});
@@ -188,6 +194,7 @@ sub parse
 	delete $self->{_previous_blocks};
 
 	$self->_substituteValues() if $self->{_expand_vars};
+	$self->{_parse_result} = $result;
 	return scalar(keys(%{$self->{_data}}));
 }
 
@@ -235,16 +242,29 @@ sub _loadFile
 	return $contents;
 }
 
+sub _validateKey
+{
+	my $self = shift;
+	my($key,$valids) = @_;
+	
+	return 1 unless defined($valids);
+	my $temp = $self->{_ignore_case} ? "(?i)" : "";
+	return 1 if grep { $key =~ qr/$temp$_/ } @$valids;
+	return undef;
+}
+
 sub newDirective
 {
 	my $self = shift;
 	my($dir,$vals) = @_;
 	$dir = lc $dir if $self->{_ignore_case};
+	return undef unless $self->_validateKey($dir,$self->{_valid_directives});
 	$self->{_current_block}->{$dir} = $vals;
 	if ( defined($self->{_root_directive}) && $self->{_root_directive} eq $dir )
 	{
 		$self->{_root_directive} = $vals->[0];
 	}
+	return 1;
 }
 
 sub beginBlock
@@ -252,6 +272,7 @@ sub beginBlock
 	my $self = shift;
 	my($block,$vals) = @_;
 	$block = lc $block if $self->{_ignore_case};
+	return undef unless $self->_validateKey($block,$self->{_valid_blocks});
 	my $ident = $block;
 	if ( defined($vals) && @$vals )
 	{

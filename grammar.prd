@@ -1,6 +1,6 @@
 { my $data; }
 
-grammar: { $data = $arg[0]; } <reject> | statement(s?) eof { $data->end() }
+grammar: { $data = $arg[0]; } <reject> | statement(s?) eof { $return = $item[2] }
 
 statement: <skip: qr/[ \t]*/> (include|multiline_directive|hereto_directive|block_start|block_end|directive|skipline)
 
@@ -13,15 +13,15 @@ hereto_directive:
 	key '<<' hereto_mark eol <skip: ''> hereto_line[$item[3]] eol
 		{ $data->newDirective($item[1], [$item[6]]) }
 
-directive:	key val(s) <commit> eol { $data->newDirective($item[1], $item[2]) }
-			| key eol { $data->newDirective($item[1], [1]) }
+directive:	key val(s) <commit> eol { $return = $data->newDirective($item[1], $item[2]) }
+			| key eol { $return = $data->newDirective($item[1], [1]) }
 
 block_start:
 	'<' key block_val(s?) '>' eol 
-		{ $data->beginBlock($item[2], $item[3]) }
+		{ $return = $data->beginBlock($item[2], $item[3]) }
 
 block_end: '</' key '>' eol
-		{ $data->endBlock($item[2]) }
+		{ $return = $data->endBlock($item[2]) }
 
 
 include: /\binclude\b/i val eol { if ( $data->include ) { $text = $data->_loadFile($item[2]) . $text; } else { $return = undef; } }
@@ -42,4 +42,4 @@ block_val: quote | /[^\s>]+/
 quote: <perl_quotelike> { $item[1][2] }
 no_space: /\S+/
 eol: /\n/
-eof: /\z/
+eof: /^\z/

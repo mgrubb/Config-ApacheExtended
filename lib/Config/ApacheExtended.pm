@@ -19,7 +19,7 @@ BEGIN {
 
 =head1 NAME
 
-Config::ApacheExtended - 
+Config::ApacheExtended - use extended apache format config files
 
 =head1 SYNOPSIS
 

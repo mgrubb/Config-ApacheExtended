@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Config-ApacheExtended
+version:      1.11
+version_from: lib/Config/ApacheExtended.pm
+installdirs:  site
+requires:
+    Parse::RecDescent:             1.8
+    Test::Simple:                  0.44
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

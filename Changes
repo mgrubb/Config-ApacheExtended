@@ -5,3 +5,9 @@ Revision history for Perl module Config::ApacheExtended
 
 1.11 Mon Dec 29 10:52:00 2003
 	- first release.
+
+1.12 Mon Dec 29 14:27:00 2003
+	- some minor changes
+		- added the ABSTRACT to pod
+		- Filled in the README file
+		- added META.yml (via MakeMaker)

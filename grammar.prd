@@ -39,7 +39,8 @@ comment: '#' /.*/ eol { 0 }
 key: /\w+/
 val: quote | no_space
 block_val: quote | /[^\s>]+/
-quote: <perl_quotelike> { $item[1][2] }
+#quote: <perl_quotelike> { $item[1][2] }
+quote: /(['"])(.*?)(?<!\\)\1/s { $2 }
 no_space: /\S+/
 eol: /\n/
 eof: /^\z/

@@ -1312,8 +1312,8 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::quote
 
 	while (!$_matched && !$commit)
 	{
-		local $skip = defined($skip) ? $skip : $Parse::RecDescent::skip;
-		Parse::RecDescent::_trace(q{Trying production: [<perl_quotelike>]},
+		
+		Parse::RecDescent::_trace(q{Trying production: [/(['"])(.*?)(?<!\\\\)\\1/s]},
 					  Parse::RecDescent::_tracefirst($_[1]),
 					  q{quote},
 					  $tracelevel)
@@ -1326,34 +1326,29 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::quote
 		my $repcount = 0;
 
 
-		
-
-		Parse::RecDescent::_trace(q{Trying directive: [<perl_quotelike>]},
-					Parse::RecDescent::_tracefirst($text),
+		Parse::RecDescent::_trace(q{Trying terminal: [/(['"])(.*?)(?<!\\\\)\\1/s]}, Parse::RecDescent::_tracefirst($text),
 					  q{quote},
 					  $tracelevel)
-						if defined $::RD_TRACE; 
-		$_tok = do { my ($match,@res);
-					 ($match,$text,undef,@res) =
-						  Text::Balanced::extract_quotelike($text,$skip);
-					  $match ? \@res : undef;
-					 };
-		if (defined($_tok))
-		{
-			Parse::RecDescent::_trace(q{>>Matched directive<< (return value: [}
-						. $_tok . q{])},
-						Parse::RecDescent::_tracefirst($text))
-							if defined $::RD_TRACE;
-		}
-		else
-		{
-			Parse::RecDescent::_trace(q{<<Didn't match directive>>},
-						Parse::RecDescent::_tracefirst($text))
-							if defined $::RD_TRACE;
-		}
+						if defined $::RD_TRACE;
+		$lastsep = "";
+		$expectation->is(q{})->at($text);
 		
-		last unless defined $_tok;
-		push @item, $item{__DIRECTIVE1__}=$_tok;
+
+		unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ s/\A(?:(['"])(.*?)(?<!\\)\1)//s)
+		{
+			
+			$expectation->failed();
+			Parse::RecDescent::_trace(q{<<Didn't match terminal>>},
+						  Parse::RecDescent::_tracefirst($text))
+					if defined $::RD_TRACE;
+
+			last;
+		}
+		Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
+						. $& . q{])},
+						  Parse::RecDescent::_tracefirst($text))
+					if defined $::RD_TRACE;
+		push @item, $item{__PATTERN1__}=$&;
 		
 
 		Parse::RecDescent::_trace(q{Trying action},
@@ -1363,7 +1358,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::quote
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { $item[1][2] };
+		$_tok = ($_noactions) ? 0 : do { $2 };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -1379,7 +1374,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::quote
 		
 
 
-		Parse::RecDescent::_trace(q{>>Matched production: [<perl_quotelike>]<<},
+		Parse::RecDescent::_trace(q{>>Matched production: [/(['"])(.*?)(?<!\\\\)\\1/s]<<},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{quote},
 					  $tracelevel)
@@ -3258,7 +3253,7 @@ sub Parse::RecDescent::Config::ApacheExtended::Grammar::grammar
 						if defined $::RD_TRACE;
 		
 
-		$_tok = ($_noactions) ? 0 : do { $item[2] };
+		$_tok = ($_noactions) ? 0 : do { $return = $item[2] };
 		unless (defined $_tok)
 		{
 			Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
@@ -4266,6 +4261,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                         'calls' => [
                                                                      'val'
                                                                    ],
+                                                        'changed' => 0,
                                                         'opcount' => 0,
                                                         'prods' => [
                                                                      bless( {
@@ -4291,12 +4287,12 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                    ],
                                                         'name' => 'hereto_mark',
                                                         'vars' => '',
-                                                        'changed' => 0,
                                                         'line' => 35
                                                       }, 'Parse::RecDescent::Rule' ),
                               'eol' => bless( {
                                                 'impcount' => 0,
                                                 'calls' => [],
+                                                'changed' => 0,
                                                 'opcount' => 0,
                                                 'prods' => [
                                                              bless( {
@@ -4309,14 +4305,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                       'actcount' => 0,
                                                                       'items' => [
                                                                                    bless( {
-                                                                                            'description' => '/\\\\n/',
-                                                                                            'rdelim' => '/',
                                                                                             'pattern' => '\\n',
                                                                                             'hashname' => '__PATTERN1__',
+                                                                                            'description' => '/\\\\n/',
                                                                                             'lookahead' => 0,
-                                                                                            'ldelim' => '/',
+                                                                                            'rdelim' => '/',
+                                                                                            'line' => 46,
                                                                                             'mod' => '',
-                                                                                            'line' => 44
+                                                                                            'ldelim' => '/'
                                                                                           }, 'Parse::RecDescent::Token' )
                                                                                  ],
                                                                       'line' => undef
@@ -4324,8 +4320,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                            ],
                                                 'name' => 'eol',
                                                 'vars' => '',
-                                                'changed' => 0,
-                                                'line' => 44
+                                                'line' => 46
                                               }, 'Parse::RecDescent::Rule' ),
                               'skipline' => bless( {
                                                      'impcount' => 0,
@@ -4333,6 +4328,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                   'comment',
                                                                   'eol'
                                                                 ],
+                                                     'changed' => 0,
                                                      'opcount' => 0,
                                                      'prods' => [
                                                                   bless( {
@@ -4384,7 +4380,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                 ],
                                                      'name' => 'skipline',
                                                      'vars' => '',
-                                                     'changed' => 0,
                                                      'line' => 29
                                                    }, 'Parse::RecDescent::Rule' ),
                               'include' => bless( {
@@ -4393,6 +4388,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                  'val',
                                                                  'eol'
                                                                ],
+                                                    'changed' => 0,
                                                     'opcount' => 0,
                                                     'prods' => [
                                                                  bless( {
@@ -4405,14 +4401,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                           'actcount' => 1,
                                                                           'items' => [
                                                                                        bless( {
-                                                                                                'description' => '/\\\\binclude\\\\b/i',
-                                                                                                'rdelim' => '/',
                                                                                                 'pattern' => '\\binclude\\b',
                                                                                                 'hashname' => '__PATTERN1__',
+                                                                                                'description' => '/\\\\binclude\\\\b/i',
                                                                                                 'lookahead' => 0,
-                                                                                                'ldelim' => '/',
+                                                                                                'rdelim' => '/',
+                                                                                                'line' => 27,
                                                                                                 'mod' => 'i',
-                                                                                                'line' => 27
+                                                                                                'ldelim' => '/'
                                                                                               }, 'Parse::RecDescent::Token' ),
                                                                                        bless( {
                                                                                                 'subrule' => 'val',
@@ -4442,7 +4438,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                ],
                                                     'name' => 'include',
                                                     'vars' => '',
-                                                    'changed' => 0,
                                                     'line' => 27
                                                   }, 'Parse::RecDescent::Rule' ),
                               'block_start' => bless( {
@@ -4452,6 +4447,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                      'block_val',
                                                                      'eol'
                                                                    ],
+                                                        'changed' => 0,
                                                         'opcount' => 0,
                                                         'prods' => [
                                                                      bless( {
@@ -4516,12 +4512,12 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                    ],
                                                         'name' => 'block_start',
                                                         'vars' => '',
-                                                        'changed' => 0,
                                                         'line' => 19
                                                       }, 'Parse::RecDescent::Rule' ),
                               'key' => bless( {
                                                 'impcount' => 0,
                                                 'calls' => [],
+                                                'changed' => 0,
                                                 'opcount' => 0,
                                                 'prods' => [
                                                              bless( {
@@ -4534,14 +4530,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                       'actcount' => 0,
                                                                       'items' => [
                                                                                    bless( {
-                                                                                            'description' => '/\\\\w+/',
-                                                                                            'rdelim' => '/',
                                                                                             'pattern' => '\\w+',
                                                                                             'hashname' => '__PATTERN1__',
+                                                                                            'description' => '/\\\\w+/',
                                                                                             'lookahead' => 0,
-                                                                                            'ldelim' => '/',
+                                                                                            'rdelim' => '/',
+                                                                                            'line' => 39,
                                                                                             'mod' => '',
-                                                                                            'line' => 39
+                                                                                            'ldelim' => '/'
                                                                                           }, 'Parse::RecDescent::Token' )
                                                                                  ],
                                                                       'line' => undef
@@ -4549,7 +4545,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                            ],
                                                 'name' => 'key',
                                                 'vars' => '',
-                                                'changed' => 0,
                                                 'line' => 39
                                               }, 'Parse::RecDescent::Rule' ),
                               'statement' => bless( {
@@ -4557,6 +4552,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                       'calls' => [
                                                                    '_alternation_1_of_production_1_of_rule_statement'
                                                                  ],
+                                                      'changed' => 0,
                                                       'opcount' => 0,
                                                       'prods' => [
                                                                    bless( {
@@ -4589,39 +4585,38 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                  ],
                                                       'name' => 'statement',
                                                       'vars' => '',
-                                                      'changed' => 0,
                                                       'line' => 5
                                                     }, 'Parse::RecDescent::Rule' ),
                               'quote' => bless( {
                                                   'impcount' => 0,
                                                   'calls' => [],
+                                                  'changed' => 0,
                                                   'opcount' => 0,
                                                   'prods' => [
                                                                bless( {
                                                                         'number' => '0',
                                                                         'strcount' => 0,
-                                                                        'dircount' => 1,
+                                                                        'dircount' => 0,
                                                                         'uncommit' => undef,
                                                                         'error' => undef,
-                                                                        'patcount' => 0,
+                                                                        'patcount' => 1,
                                                                         'actcount' => 1,
                                                                         'items' => [
                                                                                      bless( {
-                                                                                              'hashname' => '__DIRECTIVE1__',
-                                                                                              'name' => '<perl_quotelike>',
+                                                                                              'pattern' => '([\'"])(.*?)(?<!\\\\)\\1',
+                                                                                              'hashname' => '__PATTERN1__',
+                                                                                              'description' => '/([\'"])(.*?)(?<!\\\\\\\\)\\\\1/s',
                                                                                               'lookahead' => 0,
-                                                                                              'line' => 42,
-                                                                                              'code' => 'my ($match,@res);
-					 ($match,$text,undef,@res) =
-						  Text::Balanced::extract_quotelike($text,$skip);
-					  $match ? \\@res : undef;
-					'
-                                                                                            }, 'Parse::RecDescent::Directive' ),
+                                                                                              'rdelim' => '/',
+                                                                                              'line' => 43,
+                                                                                              'mod' => 's',
+                                                                                              'ldelim' => '/'
+                                                                                            }, 'Parse::RecDescent::Token' ),
                                                                                      bless( {
                                                                                               'hashname' => '__ACTION1__',
                                                                                               'lookahead' => 0,
-                                                                                              'line' => 42,
-                                                                                              'code' => '{ $item[1][2] }'
+                                                                                              'line' => 43,
+                                                                                              'code' => '{ $2 }'
                                                                                             }, 'Parse::RecDescent::Action' )
                                                                                    ],
                                                                         'line' => undef
@@ -4629,7 +4624,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                              ],
                                                   'name' => 'quote',
                                                   'vars' => '',
-                                                  'changed' => 0,
                                                   'line' => 42
                                                 }, 'Parse::RecDescent::Rule' ),
                               '_alternation_1_of_production_1_of_rule_statement' => bless( {
@@ -4643,6 +4637,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                           'directive',
                                                                                                           'skipline'
                                                                                                         ],
+                                                                                             'changed' => 0,
                                                                                              'opcount' => 0,
                                                                                              'prods' => [
                                                                                                           bless( {
@@ -4660,7 +4655,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 46
+                                                                                                                                         'line' => 48
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
                                                                                                                    'line' => undef
@@ -4680,10 +4675,10 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 46
+                                                                                                                                         'line' => 48
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 46
+                                                                                                                   'line' => 48
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
                                                                                                                    'number' => '2',
@@ -4700,10 +4695,10 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 46
+                                                                                                                                         'line' => 48
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 46
+                                                                                                                   'line' => 48
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
                                                                                                                    'number' => '3',
@@ -4720,10 +4715,10 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 46
+                                                                                                                                         'line' => 48
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 46
+                                                                                                                   'line' => 48
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
                                                                                                                    'number' => '4',
@@ -4740,10 +4735,10 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 46
+                                                                                                                                         'line' => 48
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 46
+                                                                                                                   'line' => 48
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
                                                                                                                    'number' => '5',
@@ -4760,10 +4755,10 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 46
+                                                                                                                                         'line' => 48
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 46
+                                                                                                                   'line' => 48
                                                                                                                  }, 'Parse::RecDescent::Production' ),
                                                                                                           bless( {
                                                                                                                    'number' => '6',
@@ -4780,20 +4775,20 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
                                                                                                                                          'lookahead' => 0,
-                                                                                                                                         'line' => 46
+                                                                                                                                         'line' => 48
                                                                                                                                        }, 'Parse::RecDescent::Subrule' )
                                                                                                                               ],
-                                                                                                                   'line' => 46
+                                                                                                                   'line' => 48
                                                                                                                  }, 'Parse::RecDescent::Production' )
                                                                                                         ],
                                                                                              'name' => '_alternation_1_of_production_1_of_rule_statement',
                                                                                              'vars' => '',
-                                                                                             'changed' => 0,
-                                                                                             'line' => 46
+                                                                                             'line' => 48
                                                                                            }, 'Parse::RecDescent::Rule' ),
                               'hereto_line' => bless( {
                                                         'impcount' => 0,
                                                         'calls' => [],
+                                                        'changed' => 0,
                                                         'opcount' => 0,
                                                         'prods' => [
                                                                      bless( {
@@ -4806,14 +4801,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                               'actcount' => 1,
                                                                               'items' => [
                                                                                            bless( {
-                                                                                                    'description' => '/(.*?)$arg[0]/sm',
-                                                                                                    'rdelim' => '/',
                                                                                                     'pattern' => '(.*?)$arg[0]',
                                                                                                     'hashname' => '__PATTERN1__',
+                                                                                                    'description' => '/(.*?)$arg[0]/sm',
                                                                                                     'lookahead' => 0,
-                                                                                                    'ldelim' => '/',
+                                                                                                    'rdelim' => '/',
+                                                                                                    'line' => 36,
                                                                                                     'mod' => 'sm',
-                                                                                                    'line' => 36
+                                                                                                    'ldelim' => '/'
                                                                                                   }, 'Parse::RecDescent::Token' ),
                                                                                            bless( {
                                                                                                     'hashname' => '__ACTION1__',
@@ -4827,12 +4822,12 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                    ],
                                                         'name' => 'hereto_line',
                                                         'vars' => '',
-                                                        'changed' => 0,
                                                         'line' => 36
                                                       }, 'Parse::RecDescent::Rule' ),
                               'no_space' => bless( {
                                                      'impcount' => 0,
                                                      'calls' => [],
+                                                     'changed' => 0,
                                                      'opcount' => 0,
                                                      'prods' => [
                                                                   bless( {
@@ -4845,14 +4840,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                            'actcount' => 0,
                                                                            'items' => [
                                                                                         bless( {
-                                                                                                 'description' => '/\\\\S+/',
-                                                                                                 'rdelim' => '/',
                                                                                                  'pattern' => '\\S+',
                                                                                                  'hashname' => '__PATTERN1__',
+                                                                                                 'description' => '/\\\\S+/',
                                                                                                  'lookahead' => 0,
-                                                                                                 'ldelim' => '/',
+                                                                                                 'rdelim' => '/',
+                                                                                                 'line' => 45,
                                                                                                  'mod' => '',
-                                                                                                 'line' => 43
+                                                                                                 'ldelim' => '/'
                                                                                                }, 'Parse::RecDescent::Token' )
                                                                                       ],
                                                                            'line' => undef
@@ -4860,14 +4855,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                 ],
                                                      'name' => 'no_space',
                                                      'vars' => '',
-                                                     'changed' => 0,
-                                                     'line' => 43
+                                                     'line' => 44
                                                    }, 'Parse::RecDescent::Rule' ),
                               'multiline_directive' => bless( {
                                                                 'impcount' => 0,
                                                                 'calls' => [
                                                                              'eol'
                                                                            ],
+                                                                'changed' => 0,
                                                                 'opcount' => 0,
                                                                 'prods' => [
                                                                              bless( {
@@ -4880,14 +4875,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                       'actcount' => 1,
                                                                                       'items' => [
                                                                                                    bless( {
-                                                                                                            'description' => '/(.*?[\\\\\\\\][ \\\\t]*\\\\n)+.*/',
-                                                                                                            'rdelim' => '/',
                                                                                                             'pattern' => '(.*?[\\\\][ \\t]*\\n)+.*',
                                                                                                             'hashname' => '__PATTERN1__',
+                                                                                                            'description' => '/(.*?[\\\\\\\\][ \\\\t]*\\\\n)+.*/',
                                                                                                             'lookahead' => 0,
-                                                                                                            'ldelim' => '/',
+                                                                                                            'rdelim' => '/',
+                                                                                                            'line' => 8,
                                                                                                             'mod' => '',
-                                                                                                            'line' => 8
+                                                                                                            'ldelim' => '/'
                                                                                                           }, 'Parse::RecDescent::Token' ),
                                                                                                    bless( {
                                                                                                             'subrule' => 'eol',
@@ -4910,7 +4905,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                            ],
                                                                 'name' => 'multiline_directive',
                                                                 'vars' => '',
-                                                                'changed' => 0,
                                                                 'line' => 7
                                                               }, 'Parse::RecDescent::Rule' ),
                               'val' => bless( {
@@ -4919,6 +4913,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                              'quote',
                                                              'no_space'
                                                            ],
+                                                'changed' => 0,
                                                 'opcount' => 0,
                                                 'prods' => [
                                                              bless( {
@@ -4964,7 +4959,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                            ],
                                                 'name' => 'val',
                                                 'vars' => '',
-                                                'changed' => 0,
                                                 'line' => 40
                                               }, 'Parse::RecDescent::Rule' ),
                               'block_val' => bless( {
@@ -4972,6 +4966,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                       'calls' => [
                                                                    'quote'
                                                                  ],
+                                                      'changed' => 0,
                                                       'opcount' => 0,
                                                       'prods' => [
                                                                    bless( {
@@ -5004,14 +4999,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                             'actcount' => 0,
                                                                             'items' => [
                                                                                          bless( {
-                                                                                                  'description' => '/[^\\\\s>]+/',
-                                                                                                  'rdelim' => '/',
                                                                                                   'pattern' => '[^\\s>]+',
                                                                                                   'hashname' => '__PATTERN1__',
+                                                                                                  'description' => '/[^\\\\s>]+/',
                                                                                                   'lookahead' => 0,
-                                                                                                  'ldelim' => '/',
+                                                                                                  'rdelim' => '/',
+                                                                                                  'line' => 41,
                                                                                                   'mod' => '',
-                                                                                                  'line' => 41
+                                                                                                  'ldelim' => '/'
                                                                                                 }, 'Parse::RecDescent::Token' )
                                                                                        ],
                                                                             'line' => 41
@@ -5019,7 +5014,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                  ],
                                                       'name' => 'block_val',
                                                       'vars' => '',
-                                                      'changed' => 0,
                                                       'line' => 41
                                                     }, 'Parse::RecDescent::Rule' ),
                               'hereto_directive' => bless( {
@@ -5030,6 +5024,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                           'eol',
                                                                           'hereto_line'
                                                                         ],
+                                                             'changed' => 0,
                                                              'opcount' => 0,
                                                              'prods' => [
                                                                           bless( {
@@ -5107,7 +5102,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                         ],
                                                              'name' => 'hereto_directive',
                                                              'vars' => '',
-                                                             'changed' => 0,
                                                              'line' => 12
                                                            }, 'Parse::RecDescent::Rule' ),
                               'grammar' => bless( {
@@ -5116,6 +5110,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                  'statement',
                                                                  'eof'
                                                                ],
+                                                    'changed' => 0,
                                                     'opcount' => 0,
                                                     'prods' => [
                                                                  bless( {
@@ -5174,7 +5169,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                 'hashname' => '__ACTION1__',
                                                                                                 'lookahead' => 0,
                                                                                                 'line' => 3,
-                                                                                                'code' => '{ $item[2] }'
+                                                                                                'code' => '{ $return = $item[2] }'
                                                                                               }, 'Parse::RecDescent::Action' )
                                                                                      ],
                                                                           'line' => 3
@@ -5182,7 +5177,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                ],
                                                     'name' => 'grammar',
                                                     'vars' => '',
-                                                    'changed' => 0,
                                                     'line' => 3
                                                   }, 'Parse::RecDescent::Rule' ),
                               'comment' => bless( {
@@ -5190,6 +5184,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                     'calls' => [
                                                                  'eol'
                                                                ],
+                                                    'changed' => 0,
                                                     'opcount' => 0,
                                                     'prods' => [
                                                                  bless( {
@@ -5209,14 +5204,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                                                 'line' => 38
                                                                                               }, 'Parse::RecDescent::Literal' ),
                                                                                        bless( {
-                                                                                                'description' => '/.*/',
-                                                                                                'rdelim' => '/',
                                                                                                 'pattern' => '.*',
                                                                                                 'hashname' => '__PATTERN1__',
+                                                                                                'description' => '/.*/',
                                                                                                 'lookahead' => 0,
-                                                                                                'ldelim' => '/',
+                                                                                                'rdelim' => '/',
+                                                                                                'line' => 38,
                                                                                                 'mod' => '',
-                                                                                                'line' => 38
+                                                                                                'ldelim' => '/'
                                                                                               }, 'Parse::RecDescent::Token' ),
                                                                                        bless( {
                                                                                                 'subrule' => 'eol',
@@ -5238,12 +5233,12 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                ],
                                                     'name' => 'comment',
                                                     'vars' => '',
-                                                    'changed' => 0,
                                                     'line' => 38
                                                   }, 'Parse::RecDescent::Rule' ),
                               'eof' => bless( {
                                                 'impcount' => 0,
                                                 'calls' => [],
+                                                'changed' => 0,
                                                 'opcount' => 0,
                                                 'prods' => [
                                                              bless( {
@@ -5256,14 +5251,14 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                       'actcount' => 0,
                                                                       'items' => [
                                                                                    bless( {
-                                                                                            'description' => '/^\\\\z/',
-                                                                                            'rdelim' => '/',
                                                                                             'pattern' => '^\\z',
                                                                                             'hashname' => '__PATTERN1__',
+                                                                                            'description' => '/^\\\\z/',
                                                                                             'lookahead' => 0,
-                                                                                            'ldelim' => '/',
+                                                                                            'rdelim' => '/',
+                                                                                            'line' => 47,
                                                                                             'mod' => '',
-                                                                                            'line' => 45
+                                                                                            'ldelim' => '/'
                                                                                           }, 'Parse::RecDescent::Token' )
                                                                                  ],
                                                                       'line' => undef
@@ -5271,8 +5266,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                            ],
                                                 'name' => 'eof',
                                                 'vars' => '',
-                                                'changed' => 0,
-                                                'line' => 45
+                                                'line' => 47
                                               }, 'Parse::RecDescent::Rule' ),
                               'block_end' => bless( {
                                                       'impcount' => 0,
@@ -5280,6 +5274,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                    'key',
                                                                    'eol'
                                                                  ],
+                                                      'changed' => 0,
                                                       'opcount' => 0,
                                                       'prods' => [
                                                                    bless( {
@@ -5333,7 +5328,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                  ],
                                                       'name' => 'block_end',
                                                       'vars' => '',
-                                                      'changed' => 0,
                                                       'line' => 23
                                                     }, 'Parse::RecDescent::Rule' ),
                               'directive' => bless( {
@@ -5343,6 +5337,7 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                    'val',
                                                                    'eol'
                                                                  ],
+                                                      'changed' => 0,
                                                       'opcount' => 0,
                                                       'prods' => [
                                                                    bless( {
@@ -5434,7 +5429,6 @@ package Config::ApacheExtended::Grammar; sub new { my $self = bless( {
                                                                  ],
                                                       'name' => 'directive',
                                                       'vars' => '',
-                                                      'changed' => 0,
                                                       'line' => 16
                                                     }, 'Parse::RecDescent::Rule' )
                             }

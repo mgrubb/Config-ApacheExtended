@@ -24,3 +24,10 @@ Revision history for Perl module Config::ApacheExtended
 		another issue found by the CPAN Testing Collective.
 	- fixed issue caused by moving the version to its own file (VERSION)
 		this works, but I had not included the VERSION file in the distribution
+
+1.15 Mon Feb 16 15:07:10 CST 2004
+	- fixed an issue with quoting (May not be complete)
+		issue was concerning absolute paths.  They looked like a quote-like
+		construct to perl_quotelike.  So I had to replace perl_quotelike
+		directive in the grammar with a regular expression.  This means that
+		only ' & " are considered as quote characters.

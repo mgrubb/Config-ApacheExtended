@@ -9,12 +9,12 @@ WriteMakefile(
     ABSTRACT_FROM	=> 'lib/Config/ApacheExtended.pm',
     PREREQ_PM    => {
 					 'Carp'						=> '0',
-					 'File::Spec::Functions'	=> '1.3',
+					 'File::Spec::Functions'	=> '1.1',
 					 'IO::File'					=> '1.07',
 					 'Parse::RecDescent'		=> '1.94',
 					 'Scalar::Util'				=> '1.07',
-                     'Test::More'				=> '0.47',
-					 'Text::Balanced'			=> '1.95',
+                     'Test::More'				=> '0.44',
+					 'Text::Balanced'			=> '1.89',
                     },
 );
 

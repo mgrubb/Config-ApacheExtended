@@ -1,0 +1,27 @@
+Config::ApacheExtended 1.11
+========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Carp
+   Scalar::Util       1.07
+   Text::Balanced     1.89
+   File::Spec         0.82
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2003 Michael Grubb
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl 5 itself.

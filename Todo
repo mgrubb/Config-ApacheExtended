@@ -1,3 +1,6 @@
 TODO list for Config::ApacheExtended
 
 - rework the grammar file, to move some of the validation/substitution features into actions in the grammar
+
+- add support in the data structure and methods for access to the
+	extra parameters of a block statement

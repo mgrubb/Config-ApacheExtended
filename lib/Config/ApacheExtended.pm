@@ -8,7 +8,6 @@ use Scalar::Util qw(weaken);
 use Text::Balanced qw(extract_variable);
 use File::Spec::Functions qw(splitpath catpath abs2rel rel2abs file_name_is_absolute);
 use Carp qw(croak cluck);
-
 use strict;
 BEGIN {
 	use vars qw ($VERSION $DEBUG);
@@ -27,21 +26,95 @@ Config::ApacheExtended -
 
 =head1 SYNOPSIS
 
-  use Config::ApacheExtended
-  blah blah blah
+=for example begin
 
+  use Config::ApacheExtended
+  my $conf = Config::ApacheExtended->new(source => "t/parse.conf");
+  $conf->parse() or die "Unsuccessful Parsing of config file";
+  # Print out all the Directives
+  foreach ($conf->get())
+  {
+      print "$_ => " . $conf->get($_) . "\n";
+  }
+
+  # Show all the blocks at the root
+  foreach ($conf->block())
+  {
+      foreach ($conf->block($_))
+      {
+          print $_->[0] . " => " . $_->[1] . "\n";
+          foreach ($conf->block(@$_))
+          {
+              my $block = $_;
+              foreach ($block->get())
+			  {
+                  print "$_ => " . $block->get($_) . "\n";
+              }
+	      }
+      }
+  }
+
+=for example end
 
 =head1 DESCRIPTION
 
-Stub documentation for this module was created by ExtUtils::ModuleMaker.
-It looks like the author of the extension was negligent enough
-to leave the stub unedited.
+This module is used to parse a configuration file similar to that of the
+Apache webserver (see http://httpd.apache.org for more details).  This module
+provides several extensions to that syntax, namely variable substitution and
+Hereto documents.  Other features include, value inheritance, directive and
+block validation, and include support.  This module also handles quoted strings
+and split lines properly.
 
-Blah blah blah.
+=head1 METHODS
+
+  new( opt => "value" )
+Constructs a new Config::ApacheExtended object.
+Options are:
+
+=over 4
+
+=item source
+
+The relative or absolute path to the configuration file.
+If a relative path is given, it is resolved using File::Spec::rel2abs
+
+=item expand_vars
+
+Turn on variable expansion support. (See L<Config::ApacheExtended/"VARIABLE SUBSTITUTION">)
+Defaults to OFF.
+
+=item conf_root
+
+The directory to use as the base for relative path resolutions (i.e. for include statements)
+
+=item root_directive
+
+If this option is set then it will be used as conf_root.
+This is handy if parsing an apache config file set it to "ServerRoot".
+
+=item honor_include
+
+Set this option to false to turn off include support. 
+Defaults to ON.
+
+=item inherit_vals
+
+If this option is set value inheritance will be enabled.
+Defaults to OFF.
+
+=item ignore_case
+
+If this option is turned off then directives and block names are case sensitive.
+Defaults to ON.
 
 
-=head1 USAGE
+=back
 
+		_die_on_nokey		=> 0,
+		_die_on_noblock		=> 0,
+		_valid_directives	=> undef,
+		_valid_blocks		=> undef,
+		_source				=> undef,
 
 
 =head1 BUGS

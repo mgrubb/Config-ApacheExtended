@@ -197,12 +197,13 @@ sub _newDirective
 sub _beginBlock
 {
 	my $self = shift;
-	my($block,$name) = @_;
-	$name ||= $block;
+	my($block,$vals) = @_;
+	my $blname = defined($vals) ? $vals->[0] : $block;
+	print STDERR "BLOCK: $blname, $vals\n";
 	my $new_block = {};
 	my($current_block_name,$current_block) = @{$self->{_current_block}};
 
-	$current_block->{_data}->{$block}->{$name} = $new_block;
+	$current_block->{_data}->{$block}->{$blname} = $new_block;
 	push(@{$self->{_prev_blocks}}, $self->{_current_block});
 	$self->{_current_block} = [ $block, $new_block ];
 
@@ -267,15 +268,15 @@ multiline_directive:
 			$thisparser->directive($item[-2] . "\n",1, @arg) }
 
 hereto_directive:
-	key '<<' hereto_mark eol <skip: ''> hereto_line[$item{hereto_mark}] eol
-		{ $data->_newDirective($item{key}, [$item{hereto_line}]) }
+	key '<<' hereto_mark eol <skip: ''> hereto_line[$item[3]] eol
+		{ $data->_newDirective($item[1], [$item[6]]) }
 
-directive:	key val(s) <commit> eol { $data->_newDirective($item{key}, $item{val}) }
-			| key eol { $data->_newDirective($item{key}, [1]) }
+directive:	key val(s) <commit> eol { $data->_newDirective($item[1], $item[2]) }
+			| key eol { $data->_newDirective($item[1], [1]) }
 
 block_start:
 	'<' key block_val(s?) '>' eol 
-		{ $data->_beginBlock($item{key}, $item{val}->[0]) }
+		{ $data->_beginBlock($item[2], $item[3]) }
 
 block_end: '</' key '>' eol
 		{ $data->_endBlock($item[2]) }
@@ -288,8 +289,10 @@ hereto_line: /(.*?)$arg[0]/sm { $1 }
 
 comment: '#' /.*/ eol { 0 }
 key: /\w+/
-val: <perl_quotelike> { $item[1][2] } | /\S+/
-block_val: <perl_quotelike> { $item[1][2] } | /[^\s>]+/
+val: quote | no_space
+block_val: quote | /[^\s>]+/
+quote: <perl_quotelike> { $item[1][2] }
+no_space: /\S+/
 eol: /\n/
 eof: /\z/
 

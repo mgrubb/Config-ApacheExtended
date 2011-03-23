@@ -1,4 +1,5 @@
 CVS/.*
+.git/*
 \.bak$
 \.swp$/
 \.sw[a-z]$
